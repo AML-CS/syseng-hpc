@@ -20,8 +20,8 @@ function usage() {
     echo "Usage: $0 [options] [DATA_SOURCE]"
     echo "Runs WPS programs using the files in DATA_SOURCE as input"
     printf "\n  %-20s %s\n" "-s --skip-geogrid" "Skips geogrid"
-    printf "  %-20s %s\n" "-f --from" "Start date"
-    printf "  %-20s %s\n" "-t --to" "End date"
+    printf "  %-35s %s\n" "-f --from=DATE" "Start date"
+    printf "  %-35s %s\n" "-t --to=DATE" "End date"
     printf "  %-20s %s\n\n" "-h --help" "Show this message and exit"
 
     exit 0
@@ -41,27 +41,27 @@ GEOGRID=true
 while true; do
     case "$1" in
         -s|--skip-geogrid)
-        GEOGRID=false
-        ;;
+            GEOGRID=false
+            ;;
 
         -h|--help)
-        usage
-        ;;
+            usage
+            ;;
 
         -f|--from)
-        shift
-        FROM=$1
-        ;;
+            shift
+            FROM=$1
+            ;;
 
         -t|--to)
-        shift
-        TO=$1
-        ;;
+            shift
+            TO=$1
+            ;;
 
         --)
-        shift
-        break
-        ;;
+            shift
+            break
+            ;;
     esac
     shift
 done

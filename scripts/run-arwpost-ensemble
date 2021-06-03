@@ -1,0 +1,7 @@
+#!/usr/bin/env bash 
+
+DIR=$(pwd)
+
+for filename in $DIR/wrfda/*; do
+    run-arwpost $filename "$DIR/wrfda/ensemble-$(basename $filename)"
+done

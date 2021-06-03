@@ -165,7 +165,8 @@ unzip $ROOT_DIR/downloads/WRFDomainWizard.zip -d $ROOT_DIR/model/WRFDomainWizard
 chmod +x $ROOT_DIR/model/WRFDomainWizard/run_DomainWizard
 
 echo "Writting scripts..."
-# TODO: git clone
+git clone https://github.com/AML-CS/syseng-hpc.git
+export PATH=/opt/ohpc/pub/syseng-hpc/scripts:$PATH
 
 echo "Writting modulefile..."
 
@@ -188,7 +189,7 @@ module-whatis "URL https://github.com/wrf-model/WRF"
 
 set             version                 4.2.0
 
-prepend-path    PATH                    /opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/root/install/WRF_Model/Library/bin:/opt/ohpc/pub/apps/miniconda/4.8.3/condabin:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/bin:/opt/ohpc/pub/compiler/gcc/8.3.0/bin:/opt/ohpc/pub/utils/prun/1.3:/opt/ohpc/pub/utils/autotools/bin:/opt/ohpc/pub/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/var/lib/snapd/snap/bin:/root/bin
+prepend-path    PATH                    /opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/root/install/WRF_Model/Library/bin:/opt/ohpc/pub/apps/miniconda/4.8.3/condabin:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/bin:/opt/ohpc/pub/compiler/gcc/8.3.0/bin:/opt/ohpc/pub/utils/prun/1.3:/opt/ohpc/pub/utils/autotools/bin:/opt/ohpc/pub/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/var/lib/snapd/snap/bin:/root/bin:/opt/ohpc/pub/syseng-hpc/scripts
 prepend-path    LD_LIBRARY_PATH         /opt/ohpc/pub/WRF_Model/Library/lib:/opt/ohpc/pub/WRF_Model/Library/lib:/opt/ohpc/pub/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/lib:/opt/ohpc/pub/compiler/gcc/8.3.0/lib64
 
 setenv          CC                      gcc
@@ -216,11 +217,6 @@ setenv          WPS_DIR                 /opt/ohpc/pub/WRF_Model/model/WPS-4.2
 setenv          GEOG_DATA_PATH          /opt/ohpc/pub/WRF_Model/data/WPS_GEOG
 setenv          REAL_DATA_PATH          /opt/ohpc/pub/WRF_Model/data/WPS_REAL
 setenv          ARW_POST                /opt/ohpc/pub/WRF_Model/model/ARWpost
-
-set-alias       download-grib	        "sh /opt/ohpc/pub/syseng-hpc/scripts/download-grib.sh"
-set-alias       run-wps                 "sh /opt/ohpc/pub/syseng-hpc/scripts/run-wps.sh"
-set-alias       run-wrf                 "sh /opt/ohpc/pub/syseng-hpc/scripts/run-wrf.sh"
-set-alias       run-arwpost             "sh /opt/ohpc/pub/syseng-hpc/scripts/run-arwpost.sh"
 
 EOL
 

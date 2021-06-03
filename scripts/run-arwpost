@@ -9,7 +9,7 @@ if [[ $# -eq 2 ]]; then
     outname=$2
     echo "Configure namelist.ARWpost..."
     sed -i "s~^[[:space:]]*input_root_name.*~ input_root_name = "\'"${inputname}"\'"~" $ARW_POST/namelist.ARWpost
-    sed -i "s~^[[:space:]]*output_root_name.*~ output_root_name = "\'"./${outname}"\'"~" $ARW_POST/namelist.ARWpost
+    sed -i "s~^[[:space:]]*output_root_name.*~ output_root_name = "\'"${outname}"\'"~" $ARW_POST/namelist.ARWpost
 fi
 
 cd $ARW_POST

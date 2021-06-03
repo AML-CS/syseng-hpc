@@ -132,11 +132,11 @@ fi
 
 if ${WRF}
 then
-    rm wrfout* 2> /dev/null
+    rm -rf wrfout* 2> /dev/null
     print_msg "\nRunning wrf.exe with ${WRF_PROCESSORS} processors"
     # time sbatch run-wrf-sbatch
     time mpirun -np ${WRF_PROCESSORS} ./wrf.exe > stdout.log 2>&1
-    chown ${USER}:syseng wrfout*
+    # cholwn ${USER}:syseng wrfout*
     #cd ${DIR}
     cp ${WRF_DIR}/run/wrfout* ${DESTINATION}
     grep "SUCCESS COMPLETE WRF" "rsl.error.0000" > /dev/null

@@ -16,7 +16,7 @@ function usage() {
     exit 0
 }
 
-PREFIX="m"
+PREFIX="raw_m"
 DIRECTORY="$(pwd)"
 while true; do
  case "$1" in
@@ -73,3 +73,7 @@ for (( i=${START}; i<=$N; i++ )); do
         print_msg "\nEnsemble member ${i} created succesfully" -cgreen
     fi
 done
+
+mkdir -p ${DIRECTORY}/wrfda
+mv ${DIRECTORY}/raw_m* wrfda
+print_msg "\nFinished!" -cgreen 

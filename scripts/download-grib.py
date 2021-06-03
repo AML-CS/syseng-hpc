@@ -15,6 +15,7 @@
 
 
 import sys, os
+from pathlib import Path
 import requests
 from datetime import datetime, timedelta
 
@@ -83,5 +84,7 @@ for file in filelist:
             if chunk_size < filesize:
                 check_file_status(file_base, filesize)
     check_file_status(file_base, filesize)
-    print()
 
+Path('real-data').mkdir(parents=True, exist_ok=True)
+os.system(f"mv *.grib2 real-data")
+print("Observations saved in ./real-data!")

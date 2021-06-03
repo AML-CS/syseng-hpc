@@ -91,6 +91,7 @@ if __name__ == '__main__':
         os.system(f"rm {filename}")
         print(f"{filename} unziped and saved in ./prep-data!")
     
+    os.system('cd $WRFDA_DIR && rm -rf ob*.bufr')
     for idx, filename in enumerate(glob.glob(f"{os.getcwd()}/prep-data/*")):
         os.system(f"cd $WRFDA_DIR && ln -s {filename} ob{pad_zero(idx+1)}.bufr")
     
