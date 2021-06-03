@@ -209,7 +209,7 @@ setenv          LIBS                    -lnetcdf -lhdf5_hl -lhdf5 -lz
 setenv          JASPERLIB               /opt/ohpc/pub/WRF_Model/Library/lib
 setenv          JASPERINC               /opt/ohpc/pub/WRF_Model/Library/include
 
-setenv          BIN_DIR	                /opt/ohpc/pub/bin
+setenv          BIN_DIR	                /opt/ohpc/pub/syseng-hpc/scripts
 setenv          WRF_ROOT_DIR            /opt/ohpc/pub/WRF_Model
 setenv          WRF_DIR                 /opt/ohpc/pub/WRF_Model/model/WRF-4.2
 setenv          WPS_DIR                 /opt/ohpc/pub/WRF_Model/model/WPS-4.2
@@ -217,10 +217,10 @@ setenv          GEOG_DATA_PATH          /opt/ohpc/pub/WRF_Model/data/WPS_GEOG
 setenv          REAL_DATA_PATH          /opt/ohpc/pub/WRF_Model/data/WPS_REAL
 setenv          ARW_POST                /opt/ohpc/pub/WRF_Model/model/ARWpost
 
-set-alias       download-grib	        "sh /opt/ohpc/pub/bin/download-grib.sh"
-set-alias       run-wps                 "sh /opt/ohpc/pub/bin/run-wps.sh"
-set-alias       run-wrf                 "sh /opt/ohpc/pub/bin/run-wrf.sh"
-set-alias       run-arwpost             "sh /opt/ohpc/pub/bin/run-arwpost.sh"
+set-alias       download-grib	        "sh /opt/ohpc/pub/syseng-hpc/scripts/download-grib.sh"
+set-alias       run-wps                 "sh /opt/ohpc/pub/syseng-hpc/scripts/run-wps.sh"
+set-alias       run-wrf                 "sh /opt/ohpc/pub/syseng-hpc/scripts/run-wrf.sh"
+set-alias       run-arwpost             "sh /opt/ohpc/pub/syseng-hpc/scripts/run-arwpost.sh"
 
 EOL
 

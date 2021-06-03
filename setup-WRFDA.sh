@@ -77,12 +77,12 @@ setenv          WRFDA_ROOT_DIR          /opt/ohpc/pub/WRFDA-4DVAR
 setenv          WRFDA_DIR               /opt/ohpc/pub/WRFDA-4DVAR/work_dir
 setenv          OBSPROC_DIR		/opt/ohpc/pub/WRFDA-4DVAR/model/WRFDA/var/obsproc
 
-set-alias	download-obs		"python3 /opt/ohpc/pub/bin/download-obs.py"
-set-alias	download-prep		"python3 /opt/ohpc/pub/bin/download-prep.py"
-set-alias	download-obs		"python3 /opt/ohpc/pub/bin/download-obs.py"
-set-alias	run-obsproc		"python3 /opt/ohpc/pub/bin/run-obsproc.py"
-set-alias	generate-ensemble	"sh /opt/ohpc/pub/bin/generate-ensemble.sh"
-set-alias	run-arwpost-ensemble    "sh /opt/ohpc/pub/bin/run-arwpost-ensemble.sh"
+set-alias	download-obs		"python3 /opt/ohpc/pub/syseng-hpc/scripts/download-obs.py"
+set-alias	download-prep		"python3 /opt/ohpc/pub/syseng-hpc/scripts/download-prep.py"
+set-alias	download-obs		"python3 /opt/ohpc/pub/syseng-hpc/scripts/download-obs.py"
+set-alias	run-obsproc		"python3 /opt/ohpc/pub/syseng-hpc/scripts/run-obsproc.py"
+set-alias	generate-ensemble	"sh /opt/ohpc/pub/syseng-hpc/scripts/generate-ensemble.sh"
+set-alias	run-arwpost-ensemble    "sh /opt/ohpc/pub/syseng-hpc/scripts/run-arwpost-ensemble.sh"
 
 EOL
 
