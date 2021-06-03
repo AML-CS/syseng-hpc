@@ -1,0 +1,105 @@
+#!/bin/python3 
+
+import numpy as np
+import json
+from netCDF4 import Dataset
+from wrf import getvar, interplevel, to_np, latlon_coords, extract_times
+import math
+from datetime import datetime
+import sys
+import os
+
+def get_wind_speed(data: Dataset, t: int, z: int):
+    z *= 1000
+    height = getvar(data, "height", timeidx=t)
+    u_all = getvar(data, 'ua', units="m s-1", timeidx=t)
+    v_all = getvar(data, 'va', units="m s-1", timeidx=t)
+    w_all = getvar(data, 'wa', units="m s-1", timeidx=t)
+    u = interplevel(u_all, height, z)
+    v = interplevel(v_all, height, z)
+    w = interplevel(w_all, height, z)
+    mag = np.sqrt(u**2+v**2+w**2) 
+    return u, v, mag
+
+def get_temperature(data: Dataset, t: int, z: int):
+    z *= 1000
+    height = getvar(data, "height", timeidx=t)
+    temp_c = getvar(data, "tc", timeidx=t)
+    temp_c = interplevel(temp_c, height, z)
+    return temp_c
+
+def distance(p1, p2):
+    R = 6371e3
+    phi1 = p1[0]*math.pi/180
+    phi2 = p2[0]*math.pi/180
+    delta_phi = (p2[0] - p1[0])*math.pi/180
+    delta_lambda = (p2[1] - p1[1])*math.pi/180
+    
+    a = math.pow(math.sin(delta_phi/2), 2) + math.cos(phi1)*math.cos(phi2)*math.pow(math.sin(delta_lambda/2), 2)
+    c = 2*math.atan2(math.sqrt(a), math.sqrt(1-a));
+    
+    return R*c
+
+def get_indexes(data: Dataset, locations: dict, radius_m=30_000):
+    u,v,mag = get_wind_speed(data, t=0, z=1000)
+    lats, lons = latlon_coords(mag, as_np=True)
+    indexes = { city: [] for city,data in locations.items() }
+    for i in range(len(lats)):
+        for j in range(len(lats[0])):
+            for city,data in indexes.items():
+                point = [lats[i][j], lons[i][j]]
+                dist = distance(point, locations[city])
+                if distance(point, locations[city]) <= radius_m:
+                    data.append([i, j])
+    return indexes
+
+def get_averages(data: Dataset, city, indexes, radius_m=30_000, t=0, z=0.1):
+    u,v,mag = get_wind_speed(data, t=t, z=z)
+    temp = get_temperature(data, t=t, z=z)
+    lats, lons = latlon_coords(mag, as_np=True)
+    average = {"temperature": 0.0, "wind": 0.0}
+    speed_sum = 0
+    speed_count = 0
+    temperature_sum = 0
+    temperature_count = 0
+    
+    for point in indexes:
+        i,j = point
+        speed = float(mag[i][j].values)
+        tempe = float(temp[i][j].values)
+        if not math.isnan(speed):
+            speed_sum += speed
+            speed_count += 1
+        if not math.isnan(tempe):
+            temperature_sum += tempe
+            temperature_count += 1
+    temperature = temperature_sum / temperature_count
+    speed = speed_sum / speed_count
+    date = int(extract_times(nc, t).astype('int')/1e9)
+    return { "temperature": temperature, "wind": speed, "date": date }
+
+def get_stats(data, locations, max_time=24):
+    stats = { city: [] for city,coords in locations.items() }
+    indexes = get_indexes(data, locations)
+    for i in range(max_time):
+        for city in locations.keys():
+            avg = get_averages(data, city, indexes[city], t=i)
+            stats[city].append(avg)
+    return stats
+
+
+ciudades = {
+    'Barranquilla': (10.9878, -74.7889 ),
+    'Cartagena': (10.4,-75.5),
+    'Riohacha': (11.533, -72.9),
+    'San Andrés': (12.5460, -81.7191),
+#    'santa_marta': (11.233, -74.2),
+#    'sincelejo': (9.3, -75.4),
+#    'valledupar': (10.45, -73.25)
+}
+
+if len(sys.argv) == 2:
+    nc = Dataset(os.path.abspath(sys.argv[1]))
+    stats = { "data": get_stats(nc, ciudades), "updated_at": int(datetime.now().timestamp()) }
+    print(json.dumps(stats, indent=2))
+    

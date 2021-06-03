@@ -188,38 +188,39 @@ module-whatis "URL https://github.com/wrf-model/WRF"
 
 set             version                 4.2.0
 
-prepend-path    PATH                    $DIR/bin:$PATH
-prepend-path    LD_LIBRARY_PATH         $DIR/lib:$LD_LIBRARY_PATH
+prepend-path    PATH                    /opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/root/install/WRF_Model/Library/bin:/opt/ohpc/pub/apps/miniconda/4.8.3/condabin:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/bin:/opt/ohpc/pub/compiler/gcc/8.3.0/bin:/opt/ohpc/pub/utils/prun/1.3:/opt/ohpc/pub/utils/autotools/bin:/opt/ohpc/pub/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/var/lib/snapd/snap/bin:/root/bin
+prepend-path    LD_LIBRARY_PATH         /opt/ohpc/pub/WRF_Model/Library/lib:/opt/ohpc/pub/WRF_Model/Library/lib:/opt/ohpc/pub/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/lib:/opt/ohpc/pub/compiler/gcc/8.3.0/lib64
 
 setenv          CC                      gcc
 setenv          CXX                     g++
 setenv          FC                      gfortran
 setenv          F77                     gfortran
 
-setenv          HDF5                    $HDF5
-setenv          LD_LIBRARY_PATH         $LD_LIBRARY_PATH
+setenv          HDF5                    /opt/ohpc/pub/WRF_Model/Library
+setenv          LD_LIBRARY_PATH         /opt/ohpc/pub/WRF_Model/Library/lib:/opt/ohpc/pub/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/lib:/opt/ohpc/pub/compiler/gcc/8.3.0/lib64
 
-setenv          CPPFLAGS                $CPPFLAGS
-setenv          LDFLAGS                 $LDFLAGS
+setenv          CPPFLAGS                -I/opt/ohpc/pub/WRF_Model/Library/include
+setenv          LDFLAGS                 -L/opt/ohpc/pub/WRF_Model/Library/lib
 
-setenv          NETCDF                  $NETCDF
+setenv          NETCDF                  /opt/ohpc/pub/WRF_Model/Library
 
-setenv          LIBS                    $LIBS
+setenv          LIBS                    -lnetcdf -lhdf5_hl -lhdf5 -lz
 
-setenv          JASPERLIB               $JASPERLIB
-setenv          JASPERINC               $JASPERINC
+setenv          JASPERLIB               /opt/ohpc/pub/WRF_Model/Library/lib
+setenv          JASPERINC               /opt/ohpc/pub/WRF_Model/Library/include
 
-setenv          WRF_ROOT_DIR            $ROOT_DIR
-setenv          WRF_DIR                 $ROOT_DIR/model/WRF-4.2
-setenv          WPS_DIR                 $ROOT_DIR/model/WPS-4.2
-setenv          GEOG_DATA_PATH          $ROOT_DIR/data/WPS_GEOG
-setenv          REAL_DATA_PATH          $ROOT_DIR/data/WPS_REAL
-setenv          ARW_POST                $ROOT_DIR/model/ARWpost
+setenv          BIN_DIR	                /opt/ohpc/pub/bin
+setenv          WRF_ROOT_DIR            /opt/ohpc/pub/WRF_Model
+setenv          WRF_DIR                 /opt/ohpc/pub/WRF_Model/model/WRF-4.2
+setenv          WPS_DIR                 /opt/ohpc/pub/WRF_Model/model/WPS-4.2
+setenv          GEOG_DATA_PATH          /opt/ohpc/pub/WRF_Model/data/WPS_GEOG
+setenv          REAL_DATA_PATH          /opt/ohpc/pub/WRF_Model/data/WPS_REAL
+setenv          ARW_POST                /opt/ohpc/pub/WRF_Model/model/ARWpost
 
-set-alias       download-gridded-data   "sh $ROOT_DIR/scripts/download-gridded-data.sh"
-set-alias       download-geog-data      "sh $ROOT_DIR/scripts/download-geog-data.sh"
-set-alias       run-wps                 "sh $ROOT_DIR/scripts/run-wps.sh"
-set-alias       run-wrf                 "sh $ROOT_DIR/scripts/run-wrf.sh"
+set-alias       download-grib	        "sh /opt/ohpc/pub/bin/download-grib.sh"
+set-alias       run-wps                 "sh /opt/ohpc/pub/bin/run-wps.sh"
+set-alias       run-wrf                 "sh /opt/ohpc/pub/bin/run-wrf.sh"
+set-alias       run-arwpost             "sh /opt/ohpc/pub/bin/run-arwpost.sh"
 
 EOL
 

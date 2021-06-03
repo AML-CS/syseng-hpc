@@ -1,0 +1,13 @@
+#!/bin/python3
+
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import numpy as np
+import cartopy.crs as ccrs
+
+from IPython.display import HTML
+from netCDF4 import Dataset
+from os import system
+from wrf import getvar, interplevel, to_np, latlon_coords
+
+

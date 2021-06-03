@@ -1,9 +1,4 @@
-#!/bin/sh
-#
-# Script file which helps to run WRF 4.2 and WRFDA 4.0
-# Tested in Centos 7, Uninorte HPC
-# Author: vdguevara@uninorte.edu.co
-#
+#!/usr/bin/env bash 
 
 DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
@@ -33,17 +28,15 @@ function usage() {
 }
 
 options=$(getopt -o shf:t: --long skip-geogrid --long from: --long to: --long help  -- "$@")
+eval set -- "$options"
 
 [ $? -eq 0 ] || {
     echo "Incorrect options provided"
     exit 1
 }
 
-
 DATA_DIR="$WRF_ROOT_DIR/data/WPS_REAL"
 GEOGRID=true
-
-eval set -- "$options"
 
 while true; do
     case "$1" in
@@ -112,3 +105,4 @@ check_success ungrib
 print_msg "\nRunning metgrid..."
 ./metgrid.exe >& metgrid.log
 check_success metgrid
+

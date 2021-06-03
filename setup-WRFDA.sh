@@ -57,6 +57,7 @@ cat > /opt/ohpc/pub/modulefiles/wrfda/4.0 <<EOL
 #%Module1.0#####################################################################
 
 proc ModulesHelp { } {
+
         puts stderr " "
         puts stderr "This module loads WRFDA/WRFPLUS"
         puts stderr "\nVersion 4.0\n"
@@ -72,12 +73,16 @@ module-whatis "URL https://www2.mmm.ucar.edu/wrf/users/download/get_sources.html
 
 set             version                 4.0
 
-setenv          WRFDA_ROOT_DIR          $ROOT_DIR
-setenv          WRFDA_DIR               $WRFDA_DIR
-setenv          WRFPLUS_DIR             $WRFPLUS_DIR
+setenv          WRFDA_ROOT_DIR          /opt/ohpc/pub/WRFDA-4DVAR
+setenv          WRFDA_DIR               /opt/ohpc/pub/WRFDA-4DVAR/work_dir
+setenv          OBSPROC_DIR		/opt/ohpc/pub/WRFDA-4DVAR/model/WRFDA/var/obsproc
 
-set-alias       data-obsproc            "sh $ROOT_DIR/scripts/data-obsproc.sh"
-set-alias       run-obsproc             "sh $ROOT_DIR/scripts/run-obsproc.sh"
+set-alias	download-obs		"python3 /opt/ohpc/pub/bin/download-obs.py"
+set-alias	download-prep		"python3 /opt/ohpc/pub/bin/download-prep.py"
+set-alias	download-obs		"python3 /opt/ohpc/pub/bin/download-obs.py"
+set-alias	run-obsproc		"python3 /opt/ohpc/pub/bin/run-obsproc.py"
+set-alias	generate-ensemble	"sh /opt/ohpc/pub/bin/generate-ensemble.sh"
+set-alias	run-arwpost-ensemble    "sh /opt/ohpc/pub/bin/run-arwpost-ensemble.sh"
 
 EOL
 

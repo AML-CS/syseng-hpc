@@ -1,17 +1,12 @@
-#!/bin/sh
-#
-# Script file which helps to run WRF 4.2 and WRFDA 4.0
-# Tested in Centos 7, Uninorte HPC
-# Author: vdguevara@uninorte.edu.co
-#
+#!/usr/bin/env bash
 
-options=$(getopt -o p --long --processors: -- "$@")
+options=$(getopt -o p: --long processors: -- "$@")
 eval set -- "$options"
 
-PROCESSORS=10
+PROCESSORS=5
 while true; do
     case "$1" in
-        -o|--processors)
+    -p|--processors)
             shift
             PROCESSORS=$1
             ;;
@@ -24,8 +19,9 @@ while true; do
 done
 
 cd $WRFDA_DIR
+cp $WRF_DIR/run/wrfbdy_d01 . 
 ln -sf $WRF_DIR/run/wrfinput_d01 .
 ln -sf wrfinput_d01 fg
-ln -sf $WRF_DIR/run/wrfbdy_d01 .
 
-time mpirun -np ${PROCESSORS} ./da_wrfvar.exe
+echo "Running wrfda with ${PROCESSORS} processors"
+time mpirun -n ${PROCESSORS} ./da_wrfvar.exe > /dev/null 2>&1

@@ -1,0 +1,17 @@
+#!/bin/bash
+#SBATCH --job-name=wrf           
+#SBATCH --nodes=4                
+#SBATCH --ntasks=32              
+#SBATCH --cpus-per-task=1  
+#SBATCH --time=24:00:00          
+#SBATCH --account=syseng
+#SBATCH --partition=syseng
+
+module purge
+module load wrf/4.2.0
+
+export WRFDA_ROOT=/opt/ohpc/pub/WRFDA-4DVAR
+export WRFDA_DIR=/opt/ohpc/pub/WRFDA-4DVAR/work_dir
+export OBSPROC_DIR=/opt/ohpc/pub/WRFDA-4DVAR/model/WRFDA/var/obsproc
+
+mpiexec -n 32 ./wrf.exe

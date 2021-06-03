@@ -1,10 +1,4 @@
-#!/bin/bash
-#
-# Script file which helps to run WRF 4.2 and WRFDA 4.0
-# Tested in Centos 7, Uninorte HPC
-# Author: vdguevara@uninorte.edu.co
-#
-
+#!/usr/bin/env bash 
 print_msg() {
     options=$(getopt -o c: --long color: -- "$@")
     [ $? -eq 0 ] || {
