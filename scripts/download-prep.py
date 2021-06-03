@@ -93,6 +93,8 @@ if __name__ == '__main__':
     
     os.system('cd $WRFDA_DIR && rm -rf ob*.bufr')
     for idx, filename in enumerate(glob.glob(f"{os.getcwd()}/prep-data/*")):
-        os.system(f"cd $WRFDA_DIR && ln -s {filename} ob{pad_zero(idx+1)}.bufr")
+        linkname = f"ob{pad_zero(idx+1)}.bufr"
+        os.system(f"chmod 777 {filename}")
+        os.system(f"cd $WRFDA_DIR && ln -s {filename} {linkname}")
     
     print("Symbolic links created successfully!")

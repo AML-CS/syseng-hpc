@@ -10,8 +10,4 @@
 module purge
 module load wrf/4.2.0
 
-export WRFDA_ROOT=/opt/ohpc/pub/WRFDA-4DVAR
-export WRFDA_DIR=/opt/ohpc/pub/WRFDA-4DVAR/work_dir
-export OBSPROC_DIR=/opt/ohpc/pub/WRFDA-4DVAR/model/WRFDA/var/obsproc
-
 mpiexec -n 32 ./wrf.exe

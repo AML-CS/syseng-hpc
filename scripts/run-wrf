@@ -4,9 +4,9 @@ DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 . "$DIR/print_msg"
 
-options=$(getopt -o "WRw:r:o:f:t:s:h" --long help --long only-wrf --long only-real --long wrf-processors:\
+options=$(getopt -o "WRw:r:o:f:t:s:h:i:" --long help --long only-wrf --long only-real --long wrf-processors:\
                                     --long real-processors: --long output: --long from: --long to:\
-                                    --long time: -- "$@")
+                                    --long time: --long interval: -- "$@")
 
 function usage() {
     echo "Usage: $0 [options]"
@@ -17,9 +17,10 @@ function usage() {
     printf "  %-35s %s\n" "-r --real-processors=PROCESSOSRS" "How many processors to run real.exe with. The default value is 15"
     printf "  %-35s %s\n" "-f --from=DATE" "Start date"
     printf "  %-35s %s\n" "-t --to=DATE" "End date"
-    printf "  %-35s %s\n" "-s --time=HOURS" "Simulation time in hours"
+    printf "  %-35s %s\n" "-h --hours=HOURS" "Simulation time in hours"
+    printf "  %-35s %s\n" "-i --interval=HOURS" "Simulation interval_seconds in hours"
     printf "  %-35s %s\n" "-o --output=DESTINATION" "Copy the output to DESTINATION"
-    printf "  %-35s %s\n\n" "-h --help" "Show this message and exit"
+    printf "  %-35s %s\n\n" "--help" "Show this message and exit"
     exit 0
 }
 
@@ -57,7 +58,7 @@ while true; do
             DESTINATION=$(realpath $1)
             ;;
 
-        -h|--help)
+        --help)
             usage
             ;;
 
@@ -66,9 +67,14 @@ while true; do
             TO=$1
             ;;
 
-        -s|--time)
+        -h|--hours)
             shift
             TIME=$1
+            ;;
+    
+        -i|--interval)
+            shift
+            SECONDS=$(($1*3600))
             ;;
 
         -f|--from)
@@ -91,6 +97,11 @@ cd ${WRF_DIR}/run
 if [[ -n $TIME ]]; then
     sed -i "s/run_hours.*/run_hours = ${TIME},/" namelist.input
     print_msg "Run hours: ${TIME}" -cmagenta
+fi
+
+if [[ -n $SECONDS ]]; then
+    sed -i "s/interval_seconds.*/interval_seconds = ${SECONDS},/" namelist.input
+    print_msg "Inverval seconds: ${SECONDS}" -cmagenta
 fi
 
 if [[ -n $FROM ]]; then
@@ -132,11 +143,15 @@ fi
 
 if ${WRF}
 then
-    rm -rf wrfout* 2> /dev/null
+    rm -rf ${WRF_DIR}/run/wrfout* 2> /dev/null
     print_msg "\nRunning wrf.exe with ${WRF_PROCESSORS} processors"
     # time sbatch run-wrf-sbatch
     time mpirun -np ${WRF_PROCESSORS} ./wrf.exe > stdout.log 2>&1
-    # cholwn ${USER}:syseng wrfout*
+    if [ ! -f wrfout* ]; then
+        cat rsl.error.0000
+        exit 1
+    fi
+    chmod 777 wrfout* 2> /dev/null
     #cd ${DIR}
     cp ${WRF_DIR}/run/wrfout* ${DESTINATION}
     grep "SUCCESS COMPLETE WRF" "rsl.error.0000" > /dev/null

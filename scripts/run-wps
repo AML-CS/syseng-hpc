@@ -22,12 +22,13 @@ function usage() {
     printf "\n  %-20s %s\n" "-s --skip-geogrid" "Skips geogrid"
     printf "  %-35s %s\n" "-f --from=DATE" "Start date"
     printf "  %-35s %s\n" "-t --to=DATE" "End date"
-    printf "  %-20s %s\n\n" "-h --help" "Show this message and exit"
+    printf "  %-35s %s\n" "-i --interval=HOURS" "Simulation interval_seconds in hours"
+    printf "  %-20s %s\n\n" "--help" "Show this message and exit"
 
     exit 0
 }
 
-options=$(getopt -o shf:t: --long skip-geogrid --long from: --long to: --long help  -- "$@")
+options=$(getopt -o sf:t:i: --long skip-geogrid --long from: --long to: --long interval: --long help -- "$@")
 eval set -- "$options"
 
 [ $? -eq 0 ] || {
@@ -44,7 +45,7 @@ while true; do
             GEOGRID=false
             ;;
 
-        -h|--help)
+        --help)
             usage
             ;;
 
@@ -56,6 +57,11 @@ while true; do
         -t|--to)
             shift
             TO=$1
+            ;;
+
+        -i|--interval)
+            shift
+            SECONDS=$(($1*3600))
             ;;
 
         --)
@@ -85,7 +91,12 @@ if [[ -n $TO ]]; then
     print_msg "End date: ${TO}" -cmagenta
 fi
 
-rm met_em* 2> /dev/null
+if [[ -n $SECONDS ]]; then
+    sed -i "s/interval_seconds.*/interval_seconds = ${SECONDS},/" namelist.input
+    print_msg "Inverval seconds: ${SECONDS}" -cmagenta
+fi
+
+rm -rf met_em* 2> /dev/null
 # Geogrid
 if ${GEOGRID}; then
     print_msg "Running geogrid..."

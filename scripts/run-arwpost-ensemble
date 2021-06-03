@@ -1,7 +1,22 @@
 #!/usr/bin/env bash 
 
-DIR=$(pwd)
+options=$(getopt -o d: --long directory: -- "$@")
+eval set -- "$options"
 
-for filename in $DIR/wrfda/*; do
-    run-arwpost $filename "$DIR/wrfda/ensemble-$(basename $filename)"
+while true; do
+    case "$1" in
+    -d|--directory)
+        shift
+        DIR=$(realpath $1)
+        ;;
+    --)
+        shift
+        break
+        ;;
+    esac
+    shift
+done
+
+for filename in $DIR/m*; do
+    run-arwpost $filename "$DIR/ensemble-$(basename $filename)"
 done

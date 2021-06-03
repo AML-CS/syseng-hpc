@@ -47,9 +47,6 @@ ls -l var/build/*exe var/obsproc/src/obsproc.exe
 
 export WRFDA_DIR=$ROOT_DIR/model/WRFDA
 
-echo "Writting scripts..."
-# TODO: git clone
-
 echo "Writting modulefile..."
 
 mkdir -p /opt/ohpc/pub/modulefiles/wrfda/
@@ -74,7 +71,7 @@ module-whatis "URL https://www2.mmm.ucar.edu/wrf/users/download/get_sources.html
 set             version                 4.0
 
 prepend-path    PATH                    /opt/ohpc/pub/syseng-hpc/scripts
-setenv          WRFDA_ROOT_DIR          /opt/ohpc/pub/WRFDA-4DVAR
+setenv          WRFDA_ROOT              /opt/ohpc/pub/WRFDA-4DVAR
 setenv          WRFDA_DIR               /opt/ohpc/pub/WRFDA-4DVAR/work_dir
 setenv          OBSPROC_DIR		/opt/ohpc/pub/WRFDA-4DVAR/model/WRFDA/var/obsproc
 
