@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+#
+# Author vdguevara@uninorte.edu.co
+# More info: https://aml-cs.github.io
+#
 
 options=$(getopt -o p: --long processors: -- "$@")
 eval set -- "$options"

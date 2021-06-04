@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# Author vdguevara@uninorte.edu.co
+# More info: https://aml-cs.github.io
+#
 
 if [[ -z $WPS_FORECASTS ]] || [[ -z $WPS_DIR ]] || [[ -z $WRF_DIR ]] || [[ -z $EC2_IP ]] || [[ -z $EC2_KEY ]]; then
     echo "Environment variables not set"

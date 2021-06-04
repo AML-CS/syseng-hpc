@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+#
+# Author vdguevara@uninorte.edu.co
+# More info: https://aml-cs.github.io
+#
 
 import sys, os
 import requests
@@ -57,6 +61,5 @@ for i in range(start, end+1, 3):
             outfile.write(chunk)
             if chunk_size < filesize:
                 check_file_status(file_base, filesize)
-    print()
 
-print("Downloads completed")
+print("Downloads completed!")

@@ -1,13 +1,31 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
+#
+# Author sjdonado@uninorte.edu.co
+# More info: https://aml-cs.github.io
+#
 
-options=$(getopt -o d: --long directory: -- "$@")
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+. "$DIR/print_msg"
+
+options=$(getopt -o d:f:t: --long from: --long to: --long directory: -- "$@")
 eval set -- "$options"
+
+DIR=$(pwd)
 
 while true; do
     case "$1" in
     -d|--directory)
         shift
         DIR=$(realpath $1)
+        ;;
+    -f|--from)
+        shift
+        FROM=$1
+        ;;
+    -t|--to)
+        shift
+        TO=$1
         ;;
     --)
         shift
@@ -18,5 +36,6 @@ while true; do
 done
 
 for filename in $DIR/m*; do
-    run-arwpost $filename "$DIR/ensemble-$(basename $filename)"
+    print_msg "Reading ${filename}" -cmagenta
+    run-arwpost -f "$FROM" -t "$TO" $filename "$DIR/ensemble-$(basename $filename)"
 done

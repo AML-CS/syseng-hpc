@@ -1,4 +1,9 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
+#
+# Author vdguevara@uninorte.edu.co
+# Updated by sjdonado@uninorte.edu.co
+# More info: https://aml-cs.github.io
+#
 
 DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
@@ -38,50 +43,39 @@ while true; do
         -W|--only-wrf)
             REAL=false
             ;;
-
         -R|--only-real)
             WRF=false
             ;;
-
         -w|--wrf-processors)
             shift
             WRF_PROCESSORS="$1"
             ;;
-
         -r|--real-processors)
             shift
             REAL_PROCESSORS="$1"
             ;;
-
         -o|--output)
             shift
             DESTINATION=$(realpath $1)
             ;;
-
         --help)
             usage
             ;;
-
         -t|--to)
             shift
             TO=$1
-            ;;
-
-        -h|--hours)
+            ;;        -h|--hours)
             shift
             TIME=$1
             ;;
-    
         -i|--interval)
             shift
-            SECONDS=$(($1*3600))
+            INTERVAL=$(($1*3600))
             ;;
-
         -f|--from)
             shift
             FROM=$1
             ;;
-
         --)
             shift
             break
@@ -92,16 +86,14 @@ done
 
 cd ${WRF_DIR}/run
 
-# Namelist modification
-
 if [[ -n $TIME ]]; then
     sed -i "s/run_hours.*/run_hours = ${TIME},/" namelist.input
     print_msg "Run hours: ${TIME}" -cmagenta
 fi
 
-if [[ -n $SECONDS ]]; then
-    sed -i "s/interval_seconds.*/interval_seconds = ${SECONDS},/" namelist.input
-    print_msg "Inverval seconds: ${SECONDS}" -cmagenta
+if [[ -n $INTERVAL ]]; then
+    sed -i "s/interval_seconds.*/interval_seconds = ${INTERVAL},/" namelist.input
+    print_msg "Inverval seconds: ${INTERVAL}" -cmagenta
 fi
 
 if [[ -n $FROM ]]; then
@@ -130,6 +122,7 @@ fi
 
 rm -f rsl.*
 rm -f met_em*
+rm -f stdout.log
 ln -sf ${WPS_DIR}/met_em* .
 
 if ${REAL}
@@ -148,6 +141,7 @@ then
     # time sbatch run-wrf-sbatch
     time mpirun -np ${WRF_PROCESSORS} ./wrf.exe > stdout.log 2>&1
     if [ ! -f wrfout* ]; then
+        print_msg "An error ocurred while running WRF" -cred
         cat rsl.error.0000
         exit 1
     fi
@@ -159,6 +153,7 @@ then
         print_msg "Successful WRF run" -cgreen
     else
         print_msg "An error ocurred while running WRF" -cred
+        cat rsl.error.0000
         exit 1
     fi
 fi

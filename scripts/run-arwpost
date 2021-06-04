@@ -1,10 +1,52 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
+#
+# Author vdguevara@uninorte.edu.co
+# Updated by sjdonado@uninorte.edu.co
+# More info: https://aml-cs.github.io
+#
+
+options=$(getopt -o f:t: --long from: --long to: -- "$@")
+eval set -- "$options"
+
+[ $? -eq 0 ] || {
+    echo "Incorrect options provided"
+    exit 1
+}
+
+while true; do
+    case "$1" in
+        -f|--from)
+            shift
+            FROM=$1
+            ;;
+        -t|--to)
+            shift
+            TO=$1
+            ;;
+        --)
+            shift
+            break
+            ;;
+    esac
+    shift
+done
+
+if [[ -n $FROM ]]; then
+    HOUR=$(date --date="${FROM}" +%H)
+    FROM=$(date --date="${FROM}" +%Y-%m-%d)
+    sed -i "s/start_date.*/start_date = "${FROM}_${HOUR}:00:00",/" $ARW_POST/namelist.ARWpost 
+    print_msg "Start date: ${FROM}" -cmagenta
+fi
+
+if [[ -n $TO ]]; then
+    HOUR=$(date --date="${TO}" +%H)
+    TO=$(date --date="${TO}" +%Y-%m-%d)
+    sed -i "s/end_date.*/end_date = "${TO}_${HOUR}:00:00",/" $ARW_POST/namelist.ARWpost 
+    print_msg "End date: ${TO}" -cmagenta
+fi
 
 DIRECTORY=$(pwd)
-echo $#
 if [[ $# -eq 2 ]]; then
-    echo "Backup of namelist.ARWpost..."
-    cp $ARW_POST/namelist.ARWpost $HOME/namelist.ARWpost
     inputname=$(realpath $1)
     outname=$2
     echo "Configure namelist.ARWpost..."
@@ -15,5 +57,3 @@ fi
 cd $ARW_POST
 
 ./ARWpost.exe
-
-cp ${outname}* ${DIRECTORY}

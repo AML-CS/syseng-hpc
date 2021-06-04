@@ -1,4 +1,9 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
+#
+# Author vdguevara@uninorte.edu.co
+# More info: https://aml-cs.github.io
+#
+
 print_msg() {
     options=$(getopt -o c: --long color: -- "$@")
     [ $? -eq 0 ] || {
