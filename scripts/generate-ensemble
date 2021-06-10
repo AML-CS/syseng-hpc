@@ -105,7 +105,7 @@ for (( i=${START}; i<=$N; i++ )); do
     run-wrf --only-real -d $DOMAINS
     sed -i "s/^[[:space:]]*seed_array2.*/seed_array2=${i}/" namelist.input
     print_msg "\nPerturbing initial condition..."
-    run-wrfda -h $TIME -i $INTERVAL -p 32
+    run-wrfda -f "$FROM" -t "$TO" -h $TIME -p 32
     if [[ -f wrfvar_output ]]; then
         print_msg "\nUpdating boundary conditions..."
         ./da_update_bc.exe >& update.out
