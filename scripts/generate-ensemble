@@ -90,10 +90,13 @@ if [[ -n $2 ]]; then
 fi
 
 cd $WRFDA_DIR
+
+NAMELIST_FILE=$NAMELISTS_DIR/namelist-wrfda.input
+
 print_msg "Running simulation..."
 
-timestamp=$(date +%Y-%m-%d-%H.%M.%S)
-DIRECTORY="${DIRECTORY}/wrfda_${timestamp}"
+timestamp=$(date +%Y-%m-%d_%H:%M:%S)
+DIRECTORY="${DIRECTORY}/wrfdaout_${timestamp}"
 mkdir -p $DIRECTORY
 chmod 777 $DIRECTORY
 
@@ -103,7 +106,7 @@ for (( i=${START}; i<=$N; i++ )); do
     print_msg "\nMember ${i}" -cmagenta
     print_msg "Generating first initial condition..."
     run-wrf --only-real -d $DOMAINS
-    sed -i "s/^[[:space:]]*seed_array2.*/seed_array2=${i}/" namelist.input
+    sed -i "s/^[[:space:]]*seed_array2.*/seed_array2=${i}/" $NAMELIST_FILE
     print_msg "\nPerturbing initial condition..."
     run-wrfda -f "$FROM" -t "$TO" -h $TIME -p 32
     if [[ -f wrfvar_output ]]; then
