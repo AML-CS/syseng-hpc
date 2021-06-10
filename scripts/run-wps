@@ -28,12 +28,13 @@ function usage() {
     printf "  %-35s %s\n" "-f --from=DATE" "Start date"
     printf "  %-35s %s\n" "-t --to=DATE" "End date"
     printf "  %-35s %s\n" "-i --interval=HOURS" "Simulation interval_seconds in hours"
+    printf "  %-35s %s\n" "-d --domains=NUMBER" "Number of domains"
     printf "  %-20s %s\n\n" "--help" "Show this message and exit"
 
     exit 0
 }
 
-options=$(getopt -o sf:t:i: --long skip-geogrid --long from: --long to: --long interval: --long help -- "$@")
+options=$(getopt -o sf:t:i:d: --long skip-geogrid --long from: --long to: --long interval:  --long domains: --long help -- "$@")
 eval set -- "$options"
 
 [ $? -eq 0 ] || {
@@ -43,32 +44,32 @@ eval set -- "$options"
 
 DATA_DIR="$WRF_ROOT_DIR/data/WPS_REAL"
 GEOGRID=true
+DOMAINS=3
 
 while true; do
     case "$1" in
         -s|--skip-geogrid)
             GEOGRID=false
             ;;
-
         --help)
             usage
             ;;
-
         -f|--from)
             shift
             FROM=$1
             ;;
-
         -t|--to)
             shift
             TO=$1
             ;;
-
         -i|--interval)
             shift
             SECONDS=$(($1*3600))
             ;;
-
+        -d|--domains)
+            shift
+            DOMAINS=$1
+            ;;
         --)
             shift
             break
@@ -83,20 +84,43 @@ fi
 
 cd $WPS_DIR
 
+NAMELIST_FILE=$NAMELISTS_DIR/namelist.wps
+ln -sf $NAMELIST_FILE namelist.wps
+
 if [[ -n $FROM ]]; then
     FROM=$(date --date="${FROM}" +%Y-%m-%d_%H:%M:%S)
-    sed -i "s/start_date.*/start_date = '$FROM', '$FROM', '$FROM',/" namelist.wps
+    case $DOMAINS in
+        1)
+            sed -i "s/start_date.*/start_date = '$FROM',/" $NAMELIST_FILE 
+            ;;
+        2)
+            sed -i "s/start_date.*/start_date = '$FROM','$FROM',/" $NAMELIST_FILE
+            ;;
+        *)
+            sed -i "s/start_date.*/start_date = '$FROM','$FROM','$FROM',/" $NAMELIST_FILE
+            ;;
+    esac
     print_msg "Start date: ${FROM}" -cmagenta
 fi
 
 if [[ -n $TO ]]; then
     TO=$(date --date="${TO}" +%Y-%m-%d_%H:%M:%S)
-    sed -i "s/end_date.*/end_date =   '$TO', '$TO', '$TO',/" namelist.wps
+    case $DOMAINS in
+        1)
+            sed -i "s/end_date.*/end_date = '$TO',/" $NAMELIST_FILE 
+            ;;
+        2)
+            sed -i "s/end_date.*/end_date = '$TO','$TO',/" $NAMELIST_FILE
+            ;;
+        *)
+            sed -i "s/end_date.*/end_date = '$TO','$TO','$TO',/" $NAMELIST_FILE
+            ;;
+    esac
     print_msg "End date: ${TO}" -cmagenta
 fi
 
 if [[ -n $SECONDS ]]; then
-    sed -i "s/interval_seconds.*/interval_seconds = ${SECONDS},/" namelist.wps
+    sed -i "s/interval_seconds.*/interval_seconds = ${SECONDS},/" $NAMELIST_FILE
     print_msg "Inverval seconds: ${SECONDS}" -cmagenta
 fi
 

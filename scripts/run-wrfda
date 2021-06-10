@@ -1,31 +1,84 @@
 #!/usr/bin/env bash
 #
 # Author vdguevara@uninorte.edu.co
+# Updated by sjdonado@uninorte.edu.co
 # More info: https://aml-cs.github.io
 #
 
-options=$(getopt -o p: --long processors: -- "$@")
+DIR="${BASH_SOURCE%/*}"
+if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
+. "$DIR/print_msg"
+
+options=$(getopt -o "p:i:h:" --long help --long processors: --long hours:\
+                             --long interval: -- "$@")
+
+function usage() {
+    echo "Usage: $0 [options]"
+    echo "Runs a WRFDA 4DVAR"
+    printf "\n  %-35s %s\n" "-p  --processors=PROCESSORS" "How many processors to run. Default value is 6"
+    printf "  %-35s %s\n" "-h --hours=HOURS" "Simulation time in hours"
+    printf "  %-35s %s\n" "-i --interval=HOURS" "Simulation interval_seconds in hours"
+    printf "  %-35s %s\n\n" "--help" "Show this message and exit"
+    exit 0
+}
+
 eval set -- "$options"
 
-PROCESSORS=5
+PROCESSORS=6
 while true; do
     case "$1" in
     -p|--processors)
-            shift
-            PROCESSORS=$1
-            ;;
-        --)
-            shift
-            break
-            ;;
+        shift
+        PROCESSORS=$1
+        ;;
+    -h|--hours)
+        shift
+        TIME=$1
+        ;;
+    -i|--interval)
+        shift
+        INTERVAL=$(($1*3600))
+        ;;
+    --help)
+        usage
+        ;;
+    --)
+        shift
+        break
+        ;;
     esac
     shift
 done
 
 cd $WRFDA_DIR
+
+NAMELIST_FILE=$NAMELISTS_DIR/namelist-wrfda.input
+ln -sf $NAMELIST_FILE namelist.input
+
+if [[ -n $TIME ]]; then
+    sed -i "s/run_hours.*/run_hours = ${TIME},/" $NAMELIST_FILE
+    print_msg "Run hours: ${TIME}" -cmagenta
+fi
+
+if [[ -n $INTERVAL ]]; then
+    sed -i "s/interval_seconds.*/interval_seconds = ${INTERVAL},/" $NAMELIST_FILE
+    print_msg "Inverval seconds: ${INTERVAL}" -cmagenta
+fi
+
+rm -f wrfinput_d* 
+rm -f wrfbdy_d*
+rm -f wrfvar_output 
+
 cp $WRF_DIR/run/wrfbdy_d01 . 
 ln -sf $WRF_DIR/run/wrfinput_d01 .
 ln -sf wrfinput_d01 fg
 
-echo "Running wrfda with ${PROCESSORS} processors"
-time mpirun -n ${PROCESSORS} ./da_wrfvar.exe > /dev/null 2>&1
+print_msg "Running wrfda with ${PROCESSORS} processors" -cmagenta
+
+time mpirun -n ${PROCESSORS} ./da_wrfvar.exe > stdout.log 2>&1
+
+if [ ! -f wrfvar_output ]; then
+    print_msg "An error ocurred while running WRFDA" -cred
+    cat rsl.error.0000
+    exit 1
+fi

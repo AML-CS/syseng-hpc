@@ -210,6 +210,7 @@ setenv          LIBS                    -lnetcdf -lhdf5_hl -lhdf5 -lz
 setenv          JASPERLIB               /opt/ohpc/pub/WRF_Model/Library/lib
 setenv          JASPERINC               /opt/ohpc/pub/WRF_Model/Library/include
 
+setenv          NAMELISTS_DIR           /opt/ohpc/pub/syseng-hpc/namelists
 setenv          BIN_DIR	                /opt/ohpc/pub/syseng-hpc/scripts
 setenv          WRF_ROOT_DIR            /opt/ohpc/pub/WRF_Model
 setenv          WRF_DIR                 /opt/ohpc/pub/WRF_Model/model/WRF-4.2

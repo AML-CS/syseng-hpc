@@ -1,0 +1,39 @@
+&share
+ wrf_core = 'ARW',
+ max_dom = 1,
+ start_date = '2020-01-01_00:00:00',
+ end_date = '2020-01-02_18:00:00',
+ interval_seconds = 21600,
+ io_form_geogrid = 2,
+/
+
+&geogrid
+ parent_id         = 1,
+ parent_grid_ratio = 1,
+ i_parent_start    = 1,
+ j_parent_start    = 1,
+ e_we          = 100,
+ e_sn          = 100,
+ geog_data_res = 'default',
+ dx = 1000,
+ dy = 1000,
+ map_proj =  'lambert',
+ ref_lat   = 10.968,
+ ref_lon   = -74.781,
+ truelat1  = 10.968,
+ truelat2  = 10.968,
+ stand_lon = -74.781,
+ geog_data_path = '/opt/ohpc/pub/WRF_Model/data/WPS_GEOG'
+ ref_x = 50.0,
+ ref_y = 37.5,
+/
+
+&ungrib
+ out_format = 'WPS',
+ prefix = 'FILE',
+/
+
+&metgrid
+ fg_name = 'FILE'
+ io_form_metgrid = 2, 
+/

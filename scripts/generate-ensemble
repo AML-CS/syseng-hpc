@@ -5,37 +5,42 @@
 # More info: https://aml-cs.github.io
 #
 
+set -e
+
 DIR=$(realpath "${BASH_SOURCE%/*}")
 if [[ ! -d "$DIR" ]]; then DIR="${PWD}"; fi
 . "${DIR}/print_msg"
 
-options=$(getopt -o p:d:h:i:f:t:  --long help --long prefix: --long directory: \
+options=$(getopt -o p:o:h:i:f:t:d:  --long help --long prefix: --long output: \
                                      --long hours: --long from: --long to:\
-                                     --long interval: -- "$@")
+                                     --long interval: --long domains: -- "$@")
 eval set -- "$options"
 
 function usage() {
     echo "Usage: $0 [options] [START] END"
     echo "Generates an ensemble with members from START to END"
     printf "\n  %-30s %s\n" "-p --prefix=PREFIX" "The prefix of the member filenames (ex: m would generate m1, m2, m3,...). Default is 'm'"
-    printf "  %-30s %s\n" "-d --directory=DIRECTORY" "The directory where the members are going to be stored."
+    printf "  %-30s %s\n" "-o --output=DIRECTORY" "The directory where the members are going to be stored."
     printf "  %-35s %s\n" "-f --from=DATE" "Start date"
     printf "  %-35s %s\n" "-t --to=DATE" "End date"
     printf "  %-35s %s\n" "-h --hours=HOURS" "Simulation time in hours"
     printf "  %-35s %s\n" "-i --interval=HOURS" "Simulation interval_seconds in hours"
+    printf "  %-35s %s\n" "-d --domains=NUMBER" "Number of domains"
     printf "  %-30s %s\n\n" "--help" "Show this message and exit"
     exit 0
 }
 
 PREFIX="m"
 DIRECTORY="$(pwd)"
+DOMAINS=3
+
 while true; do
  case "$1" in
     -p|--prefix)
         shift
         PREFIX=$1
         ;;
-    -d|--directory)
+    -o|--output)
         shift
         DIRECTORY=$(realpath $1)
         mkdir -p $1
@@ -47,6 +52,10 @@ while true; do
     -i|--interval)
         shift
         INTERVAL=$1
+        ;;
+    -d|--domains)
+        shift
+        DOMAINS=$1
         ;;
     -f|--from)
         shift
@@ -88,22 +97,22 @@ DIRECTORY="${DIRECTORY}/wrfda_${timestamp}"
 mkdir -p $DIRECTORY
 chmod 777 $DIRECTORY
 
-run-wrf -h $TIME -i $INTERVAL -f "$FROM" -t "$TO" --output ${DIRECTORY}/original
+run-wrf -h $TIME -i $INTERVAL -f "$FROM" -t "$TO" -d $DOMAINS --output ${DIRECTORY}/original
 
 for (( i=${START}; i<=$N; i++ )); do
     print_msg "\nMember ${i}" -cmagenta
     print_msg "Generating first initial condition..."
-    run-wrf --only-real
+    run-wrf --only-real -d $DOMAINS
     sed -i "s/^[[:space:]]*seed_array2.*/seed_array2=${i}/" namelist.input
     print_msg "\nPerturbing initial condition..."
-    run-wrfda --processors 32
+    run-wrfda -h $TIME -i $INTERVAL -p 32
     if [[ -f wrfvar_output ]]; then
         print_msg "\nUpdating boundary conditions..."
         ./da_update_bc.exe >& update.out
         cp wrfbdy_d01 $WRF_DIR/run
         print_msg "Running simulation with new initial conditions..."
-        cp wrfvar_output ${WRF_DIR}/run/wrfinput_d01 2> /dev/null
-        run-wrf --only-wrf --output ${DIRECTORY}/${PREFIX}${i}
+        cp wrfvar_output ${WRF_DIR}/run/wrfinput_d01
+        run-wrf --only-wrf -d $DOMAINS --output ${DIRECTORY}/${PREFIX}${i}
         print_msg "\nEnsemble member ${i} created succesfully" -cgreen
     fi
 done

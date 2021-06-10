@@ -9,9 +9,9 @@ DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 . "$DIR/print_msg"
 
-options=$(getopt -o "WRw:r:o:f:t:s:h:i:" --long help --long only-wrf --long only-real --long wrf-processors:\
+options=$(getopt -o "WRw:r:o:f:t:s:h:i:d:" --long help --long only-wrf --long only-real --long wrf-processors:\
                                     --long real-processors: --long output: --long from: --long to:\
-                                    --long time: --long interval: -- "$@")
+                                    --long hours: --long interval: --long domains: -- "$@")
 
 function usage() {
     echo "Usage: $0 [options]"
@@ -24,7 +24,8 @@ function usage() {
     printf "  %-35s %s\n" "-t --to=DATE" "End date"
     printf "  %-35s %s\n" "-h --hours=HOURS" "Simulation time in hours"
     printf "  %-35s %s\n" "-i --interval=HOURS" "Simulation interval_seconds in hours"
-    printf "  %-35s %s\n" "-o --output=DESTINATION" "Copy the output to DESTINATION"
+    printf "  %-35s %s\n" "-d --domains=NUMBER" "Number of domains"
+    printf "  %-35s %s\n" "-o --output=DIR" "Copy the output to DESTINATION"
     printf "  %-35s %s\n\n" "--help" "Show this message and exit"
     exit 0
 }
@@ -35,8 +36,9 @@ DIR=$(pwd)
 REAL=true
 WRF=true
 WRF_PROCESSORS=32
-REAL_PROCESSORS=5
-DESTINATION=${HOME}/wrf/output
+REAL_PROCESSORS=6
+DESTINATION=$(pwd)
+DOMAINS=3
 
 while true; do
     case "$1" in
@@ -64,13 +66,18 @@ while true; do
         -t|--to)
             shift
             TO=$1
-            ;;        -h|--hours)
+            ;;
+        -h|--hours)
             shift
             TIME=$1
             ;;
         -i|--interval)
             shift
             INTERVAL=$(($1*3600))
+            ;;
+        -d|--domains)
+            shift
+            DOMAINS=$1
             ;;
         -f|--from)
             shift
@@ -86,13 +93,18 @@ done
 
 cd ${WRF_DIR}/run
 
+NAMELIST_FILE=$NAMELISTS_DIR/namelist-wrf.input
+ln -sf $NAMELIST_FILE namelist.input
+
+print_msg "Number of domains: ${DOMAINS}" -cmagenta
+
 if [[ -n $TIME ]]; then
-    sed -i "s/run_hours.*/run_hours = ${TIME},/" namelist.input
+    sed -i "s/run_hours.*/run_hours = ${TIME},/" $NAMELIST_FILE
     print_msg "Run hours: ${TIME}" -cmagenta
 fi
 
 if [[ -n $INTERVAL ]]; then
-    sed -i "s/interval_seconds.*/interval_seconds = ${INTERVAL},/" namelist.input
+    sed -i "s/interval_seconds.*/interval_seconds = ${INTERVAL},/" $NAMELIST_FILE
     print_msg "Inverval seconds: ${INTERVAL}" -cmagenta
 fi
 
@@ -101,10 +113,26 @@ if [[ -n $FROM ]]; then
     MONTH=$(date --date="${FROM}" +%m)
     DAY=$(date --date="${FROM}" +%d)
     HOUR=$(date --date="${FROM}" +%H)
-    sed -i "s/start_year.*/start_year = $YEAR,$YEAR,$YEAR,/" namelist.input
-    sed -i "s/start_month.*/start_month = $MONTH,$MONTH,$MONTH,/" namelist.input
-    sed -i "s/start_day.*/start_day = $DAY,$DAY,$DAY,/" namelist.input
-    sed -i "s/start_hour.*/start_hour = $HOUR,$HOUR,$HOUR,/" namelist.input
+    case $DOMAINS in
+        1)
+            sed -i "s/start_year.*/start_year = $YEAR,/" $NAMELIST_FILE
+            sed -i "s/start_month.*/start_month = $MONTH,/" $NAMELIST_FILE
+            sed -i "s/start_day.*/start_day = $DAY,/" $NAMELIST_FILE
+            sed -i "s/start_hour.*/start_hour = $HOUR,/" $NAMELIST_FILE
+            ;;
+        2)
+            sed -i "s/start_year.*/start_year = $YEAR,$YEAR,/" $NAMELIST_FILE
+            sed -i "s/start_month.*/start_month = $MONTH,$MONTH,/" $NAMELIST_FILE
+            sed -i "s/start_day.*/start_day = $DAY,$DAY,/" $NAMELIST_FILE
+            sed -i "s/start_hour.*/start_hour = $HOUR,$HOUR,/" $NAMELIST_FILE
+            ;;
+        *)
+            sed -i "s/start_year.*/start_year = $YEAR,$YEAR,$YEAR,/" $NAMELIST_FILE
+            sed -i "s/start_month.*/start_month = $MONTH,$MONTH,$MONTH,/" $NAMELIST_FILE
+            sed -i "s/start_day.*/start_day = $DAY,$DAY,$DAY,/" $NAMELIST_FILE
+            sed -i "s/start_hour.*/start_hour = $HOUR,$HOUR,$HOUR,/" $NAMELIST_FILE
+            ;;
+    esac
     print_msg "Start date: ${FROM}" -cmagenta
 fi
 
@@ -113,10 +141,26 @@ if [[ -n $TO ]]; then
     MONTH=$(date --date="${TO}" +%m)
     DAY=$(date --date="${TO}" +%d)
     HOUR=$(date --date="${TO}" +%H)
-    sed -i "s/end_year.*/end_year = $YEAR,$YEAR,$YEAR,/" namelist.input
-    sed -i "s/end_month.*/end_month = $MONTH,$MONTH,$MONTH,/" namelist.input
-    sed -i "s/end_day.*/end_day = $DAY,$DAY,$DAY,/" namelist.input
-    sed -i "s/end_hour.*/end_hour = $HOUR,$HOUR,$HOUR,/" namelist.input
+    case $DOMAINS in
+        1)
+            sed -i "s/end_year.*/end_year = $YEAR,/" $NAMELIST_FILE
+            sed -i "s/end_month.*/end_month = $MONTH,/" $NAMELIST_FILE
+            sed -i "s/end_day.*/end_day = $DAY,/" $NAMELIST_FILE
+            sed -i "s/end_hour.*/end_hour = $HOUR,/" $NAMELIST_FILE
+            ;;
+        2)
+            sed -i "s/end_year.*/end_year = $YEAR,$YEAR,/" $NAMELIST_FILE
+            sed -i "s/end_month.*/end_month = $MONTH,$MONTH,/" $NAMELIST_FILE
+            sed -i "s/end_day.*/end_day = $DAY,$DAY,/" $NAMELIST_FILE
+            sed -i "s/end_hour.*/end_hour = $HOUR,$HOUR,/" $NAMELIST_FILE
+            ;;
+        *)
+            sed -i "s/end_year.*/end_year = $YEAR,$YEAR,$YEAR,/" $NAMELIST_FILE
+            sed -i "s/end_month.*/end_month = $MONTH,$MONTH,$MONTH,/" $NAMELIST_FILE
+            sed -i "s/end_day.*/end_day = $DAY,$DAY,$DAY,/" $NAMELIST_FILE
+            sed -i "s/end_hour.*/end_hour = $HOUR,$HOUR,$HOUR,/" $NAMELIST_FILE
+            ;;
+    esac
     print_msg "End date: ${TO}" -cmagenta
 fi
 
@@ -132,6 +176,11 @@ then
     print_msg "Running real.exe with ${REAL_PROCESSORS} processors"
     # time sbatch run-real-sbatch
     time mpirun -np ${REAL_PROCESSORS} ./real.exe > stdout.log 2>&1
+    if [ ! -f wrfbdy_d* ]; then
+        print_msg "An error ocurred while running WRF real.exe" -cred
+        cat rsl.error.0000
+        exit 1
+    fi
 fi
 
 if ${WRF}

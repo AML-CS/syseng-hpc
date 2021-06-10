@@ -1,0 +1,162 @@
+&wrfvar1
+ var4d=.true.,
+ var4d_lbc=.false.,
+ var4d_bin=3600,
+ var4d_bin_rain=21600,
+ print_detail_outerloop=.true.,
+ print_detail_grad=.true.,
+/
+
+&wrfvar3
+ob_format=1,
+/
+
+&wrfvar4
+use_synopobs=.true.,
+use_shipsobs=.true.,
+use_metarobs=.true.,
+use_soundobs=.true.,
+use_pilotobs=.true.,
+use_airepobs=.true.,
+use_geoamvobs=.true.,
+use_polaramvobs=.true.,
+use_bogusobs=.true.,
+use_buoyobs=.true.,
+use_profilerobs=.true.,
+use_satemobs=.true.,
+use_gpspwobs=.false.,
+use_gpsrefobs=.false.,
+use_qscatobs=.true.,
+use_rainobs=.false.,
+/
+
+&wrfvar5
+ put_rand_seed=true
+/
+
+&wrfvar6
+! ntmax=25
+/
+
+&wrfvar7
+cv_options=3,
+/
+
+&wrfvar11
+seed_array1=20200101,
+seed_array2=1
+/
+
+&wrfvar17
+ analysis_type='RANDOMCV'
+/
+
+&wrfvar18
+analysis_date="2020-01-01_00:00:00",
+/
+
+&wrfvar21
+time_window_min="2020-01-01_00:00:00",
+/
+
+&wrfvar22
+time_window_max="2020-01-02_18:00:00",
+/
+
+&time_control
+run_days                 = 0,
+run_hours = 6,
+run_minutes              = 0,
+run_seconds              = 0,
+start_year = 2020,
+start_month = 01,
+start_day = 01,
+start_hour = 00,
+start_minute             = 00,
+start_second             = 00,
+end_year = 2020,
+end_month = 01,
+end_day = 02,
+end_hour = 18,
+end_minute               = 00,
+end_second               = 00,
+interval_seconds = 21600,
+input_from_file          = .true.,
+history_interval         = 60,
+frames_per_outfile       = 1000,
+restart                  = .false.,
+restart_interval         = 720,
+io_form_history          = 2,
+io_form_restart          = 2,
+io_form_input            = 2,
+io_form_boundary         = 2,
+/
+
+&domains
+time_step                = 6,
+time_step_fract_num      = 0,
+time_step_fract_den      = 1,
+max_dom                  = 1,
+s_we                     = 1,
+e_we                     = 100,
+s_sn                     = 1,
+e_sn                     = 100,
+s_vert                   = 1,
+e_vert                   = 33,
+p_top_requested                     = 5000,
+num_metgrid_levels       = 34,
+num_metgrid_soil_levels  = 4,
+dx                       = 1000,
+dy                       = 1000,
+grid_id                  = 1,
+parent_id                = 1,
+i_parent_start           = 1,
+j_parent_start           = 1,
+parent_grid_ratio        = 1,
+parent_time_step_ratio   = 1,
+feedback                 = 1,
+smooth_option            = 0,
+hypsometric_opt                     = 1,
+/
+
+&physics
+ physics_suite                       = 'TROPICAL'
+ mp_physics                          = -1,    -1,    -1,
+ cu_physics                          = -1,    -1,     0,
+ ra_lw_physics                       = -1,    -1,    -1,
+ ra_sw_physics                       = -1,    -1,    -1,
+ bl_pbl_physics                      = -1,    -1,    -1,
+ sf_sfclay_physics                   = -1,    -1,    -1,
+ sf_surface_physics                  = -1,    -1,    -1,
+ radt                                = 30,    30,    30,
+ bldt                                = 0,     0,     0,
+ cudt                                = 5,     5,     5,
+ icloud                              = 1,
+ num_land_cat                        = 21,
+ sf_urban_physics                    = 0,     0,     0,
+/
+
+&fdda
+/
+
+&dynamics
+ hybrid_opt                          = 0, 
+ w_damping                           = 0,
+ diff_opt                            = 1,
+ km_opt                              = 4,
+/
+&bdy_control
+ spec_bdy_width         = 10,
+ spec_zone              = 1,
+ relax_zone             = 9,
+ specified              = .true., .false., .false.,
+ nested                 = .false, .true., .true.,
+/
+
+&grib2
+/
+
+&namelist_quilt
+ nio_tasks_per_group = 0,
+ nio_groups = 1,
+/
