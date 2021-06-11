@@ -125,6 +125,7 @@ if [[ -n $SECONDS ]]; then
 fi
 
 rm -rf met_em* 2> /dev/null
+
 # Geogrid
 if ${GEOGRID}; then
     print_msg "Running geogrid..."
@@ -136,6 +137,7 @@ fi
 print_msg "\nRunning ungrib"
 print_msg "Using data in ${DATA_DIR}" -cmagenta
 ./link_grib.csh ${DATA_DIR}/*
+
 ln -sf ungrib/Variable_Tables/Vtable.GFS Vtable
 ./ungrib.exe >& ungrib.log
 check_success ungrib

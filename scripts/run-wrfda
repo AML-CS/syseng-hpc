@@ -34,8 +34,7 @@ while true; do
         ;;
     -h|--hours)
         shift
-        TIME=$1
-        INTERVAL=$(($1*3600))
+        SECONDS=$(($1*3600))
         ;;
     --help)
         usage
@@ -43,10 +42,6 @@ while true; do
     -t|--to)
         shift
         TO=$1
-        ;;
-    -h|--hours)
-        shift
-        TIME=$1
         ;;
     -f|--from)
         shift
@@ -65,14 +60,9 @@ cd $WRFDA_DIR
 NAMELIST_FILE=$NAMELISTS_DIR/namelist-wrfda.input
 ln -sf $NAMELIST_FILE namelist.input
 
-if [[ -n $TIME ]]; then
-    sed -i "s/run_hours.*/run_hours = ${TIME},/" $NAMELIST_FILE
-    print_msg "Run hours: ${TIME}" -cmagenta
-fi
-
-if [[ -n $INTERVAL ]]; then
-    sed -i "s/interval_seconds.*/interval_seconds = ${INTERVAL},/" $NAMELIST_FILE
-    print_msg "Inverval seconds: ${INTERVAL}" -cmagenta
+if [[ -n $SECONDS ]]; then
+    sed -i "s/interval_seconds.*/interval_seconds = ${SECONDS},/" $NAMELIST_FILE
+    print_msg "4DVAR inverval seconds: ${SECONDS}" -cmagenta
 fi
 
 if [[ -n $FROM ]]; then
@@ -117,6 +107,8 @@ rm -f wrfvar_output
 cp $WRF_DIR/run/wrfbdy_d01 . 
 ln -sf $WRF_DIR/run/wrfinput_d01 .
 ln -sf wrfinput_d01 fg
+
+# ulimit -s unlimited
 
 print_msg "Running wrfda with ${PROCESSORS} processors" -cmagenta
 

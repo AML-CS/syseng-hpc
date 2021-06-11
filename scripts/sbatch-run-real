@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=wrf-real           
-#SBATCH --ntasks=6 
+#SBATCH --ntasks=32
 #SBATCH --cpus-per-task=1
 #SBATCH --time=1:00:00          
 #SBATCH --account=syseng
@@ -9,7 +9,10 @@
 
 module load wrf gnu8/8.3.0 openmpi3/3.1.4
 
+export OMP_NUM_THREADS=1
+
 # sudo chown -R :syseng $WRF_DIR/run
 cd $WRF_DIR/run
 
-mpiexec ./real.exe > stdout.log 2>&1
+# mpiexec ./real.exe 
+srun --mpi=pmi2 ./wrf.exe > stdout.log 2>&1

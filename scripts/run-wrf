@@ -9,9 +9,9 @@ DIR="${BASH_SOURCE%/*}"
 if [[ ! -d "$DIR" ]]; then DIR="$PWD"; fi
 . "$DIR/print_msg"
 
-options=$(getopt -o "WRw:r:o:f:t:s:h:i:d:" --long help --long only-wrf --long only-real --long wrf-processors:\
+options=$(getopt -o "WRw:r:o:f:t:s:i:d:" --long help --long only-wrf --long only-real --long wrf-processors:\
                                     --long real-processors: --long output: --long from: --long to:\
-                                    --long hours: --long interval: --long domains: -- "$@")
+                                    --long interval: --long domains: -- "$@")
 
 function usage() {
     echo "Usage: $0 [options]"
@@ -22,8 +22,7 @@ function usage() {
     printf "  %-35s %s\n" "-r --real-processors=PROCESSOSRS" "How many processors to run real.exe with. The default value is 15"
     printf "  %-35s %s\n" "-f --from=DATE" "Start date"
     printf "  %-35s %s\n" "-t --to=DATE" "End date"
-    printf "  %-35s %s\n" "-h --hours=HOURS" "Simulation time in hours"
-    printf "  %-35s %s\n" "-i --interval=HOURS" "Simulation interval_seconds in hours"
+    printf "  %-35s %s\n" "-i --interval=HOURS" "Simulation real data interval seconds in hours"
     printf "  %-35s %s\n" "-d --domains=NUMBER" "Number of domains"
     printf "  %-35s %s\n" "-o --output=DIR" "Copy the output to DESTINATION"
     printf "  %-35s %s\n\n" "--help" "Show this message and exit"
@@ -67,10 +66,6 @@ while true; do
             shift
             TO=$1
             ;;
-        -h|--hours)
-            shift
-            TIME=$1
-            ;;
         -i|--interval)
             shift
             INTERVAL=$(($1*3600))
@@ -98,14 +93,9 @@ ln -sf $NAMELIST_FILE namelist.input
 
 print_msg "Number of domains: ${DOMAINS}" -cmagenta
 
-if [[ -n $TIME ]]; then
-    sed -i "s/run_hours.*/run_hours = ${TIME},/" $NAMELIST_FILE
-    print_msg "Run hours: ${TIME}" -cmagenta
-fi
-
 if [[ -n $INTERVAL ]]; then
     sed -i "s/interval_seconds.*/interval_seconds = ${INTERVAL},/" $NAMELIST_FILE
-    print_msg "Inverval seconds: ${INTERVAL}" -cmagenta
+    print_msg "Real data inverval seconds: ${INTERVAL}" -cmagenta
 fi
 
 if [[ -n $FROM ]]; then

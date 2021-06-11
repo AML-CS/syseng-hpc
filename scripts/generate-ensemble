@@ -33,6 +33,7 @@ function usage() {
 PREFIX="m"
 DIRECTORY="$(pwd)"
 DOMAINS=3
+WRFDA_PROCESSORS=32
 
 while true; do
  case "$1" in
@@ -47,7 +48,7 @@ while true; do
         ;;
     -h|--hours)
         shift
-        TIME=$1
+        HOURS=$1
         ;;
     -i|--interval)
         shift
@@ -100,7 +101,7 @@ DIRECTORY="${DIRECTORY}/wrfdaout_${timestamp}"
 mkdir -p $DIRECTORY
 chmod 777 $DIRECTORY
 
-run-wrf -h $TIME -i $INTERVAL -f "$FROM" -t "$TO" -d $DOMAINS --output ${DIRECTORY}/original
+run-wrf -i $INTERVAL -f "$FROM" -t "$TO" -d $DOMAINS --output ${DIRECTORY}/original
 
 for (( i=${START}; i<=$N; i++ )); do
     print_msg "\nMember ${i}" -cmagenta
@@ -108,7 +109,7 @@ for (( i=${START}; i<=$N; i++ )); do
     run-wrf --only-real -d $DOMAINS
     sed -i "s/^[[:space:]]*seed_array2.*/seed_array2=${i}/" $NAMELIST_FILE
     print_msg "\nPerturbing initial condition..."
-    run-wrfda -f "$FROM" -t "$TO" -h $TIME -p 32
+    run-wrfda -f "$FROM" -t "$TO" -h $HOURS -p $WRFDA_PROCESSORS
     if [[ -f wrfvar_output ]]; then
         print_msg "\nUpdating boundary conditions..."
         ./da_update_bc.exe >& update.out
