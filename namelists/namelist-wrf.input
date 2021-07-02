@@ -1,18 +1,18 @@
 &time_control
 run_days                 = 0,
-run_hours = 4,
+run_hours                = 0,
 run_minutes              = 0,
 run_seconds              = 0,
-start_year = 2020,
-start_month = 01,
-start_day = 01,
-start_hour = 00,
+start_year = 2020,2020,2020,
+start_month = 01,01,01,
+start_day = 01,01,01,
+start_hour = 00,00,00,
 start_minute             = 00,
 start_second             = 00,
-end_year = 2020,
-end_month = 01,
-end_day = 02,
-end_hour = 18,
+end_year = 2020,2020,2020,
+end_month = 01,01,01,
+end_day = 01,01,01,
+end_hour = 06,06,06,
 end_minute               = 00,
 end_second               = 00,
 interval_seconds = 21600,
@@ -38,7 +38,7 @@ s_sn                     = 1,
 e_sn                     = 100,
 s_vert                   = 1,
 e_vert                   = 33,
-p_top_requested                     = 5000,
+p_top_requested          = 5000,
 num_metgrid_levels       = 34,
 num_metgrid_soil_levels  = 4,
 dx                       = 1000,
@@ -49,33 +49,33 @@ i_parent_start           = 1,
 j_parent_start           = 1,
 parent_grid_ratio        = 1,
 parent_time_step_ratio   = 1,
-feedback                 = 1,
+feedback                 = 0,
 smooth_option            = 0,
-hypsometric_opt                     = 1,
+hypsometric_opt          = 1,
 /
 
 &physics
  physics_suite                       = 'TROPICAL'
- mp_physics                          = -1,    -1,    -1,
- cu_physics                          = -1,    -1,    -1,
- ra_lw_physics                       = -1,    -1,    -1,
- ra_sw_physics                       = -1,    -1,    -1,
- bl_pbl_physics                      = -1,    -1,    -1,
- sf_sfclay_physics                   = -1,    -1,    -1,
- sf_surface_physics                  = -1,    -1,    -1,
- radt                                = 30,    30,    30,
- bldt                                = 0,     0,     0,
- cudt                                = 5,     5,     5,
+ mp_physics                          = -1,
+ cu_physics                          = -1,
+ ra_lw_physics                       = -1,
+ ra_sw_physics                       = -1,
+ bl_pbl_physics                      = -1,
+ sf_sfclay_physics                   = -1,
+ sf_surface_physics                  = -1,
+ radt                                = 30,
+ bldt                                = 0,
+ cudt                                = 5,
  icloud                              = 1,
  num_land_cat                        = 21,
- sf_urban_physics                    = 0,     0,     0,
+ sf_urban_physics                    = 0,
 /
 
 &fdda
 /
 
-&dynamics
- hybrid_opt                          = 0, 
+ &dynamics
+ hybrid_opt                          = 2, 
  w_damping                           = 0,
  diff_opt                            = 1,      1,      1,
  km_opt                              = 4,      4,      4,
@@ -91,20 +91,17 @@ hypsometric_opt                     = 1,
  moist_adv_opt                       = 1,      1,      1,     
  scalar_adv_opt                      = 1,      1,      1,     
  gwd_opt                             = 1,      1,      0,
-/
+ /
 
-&bdy_control
- spec_bdy_width         = 10,
- spec_zone              = 1,
- relax_zone             = 9,
- specified              = .true., .false., .false.,
- nested                 = .false, .true., .true.,
-/
+ &bdy_control
+ spec_bdy_width                      = 5,
+ specified                           = .true.
+ /
 
-&grib2
-/
+ &grib2
+ /
 
-&namelist_quilt
+ &namelist_quilt
  nio_tasks_per_group = 0,
  nio_groups = 1,
-/
+ /

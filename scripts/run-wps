@@ -44,7 +44,7 @@ eval set -- "$options"
 
 DATA_DIR="$WRF_ROOT_DIR/data/WPS_REAL"
 GEOGRID=true
-DOMAINS=3
+DOMAINS=1
 
 while true; do
     case "$1" in

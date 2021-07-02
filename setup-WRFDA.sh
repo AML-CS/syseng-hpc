@@ -9,7 +9,7 @@
 module load wrf/4.2.0
 
 ## Dir structure
-export ROOT_DIR="/opt/ohpc/pub/WRFDA-4DVAR"
+export ROOT_DIR="/work/syseng/pub/WRFDA-4DVAR"
 mkdir -p $ROOT_DIR/downloads
 mkdir -p $ROOT_DIR/model
 
@@ -70,21 +70,20 @@ module-whatis "URL https://www2.mmm.ucar.edu/wrf/users/download/get_sources.html
 
 set             version                 4.0
 
-prepend-path    PATH                    /opt/ohpc/pub/syseng-hpc/scripts
-setenv          WRFDA_ROOT              /opt/ohpc/pub/WRFDA-4DVAR
-setenv          WRFDA_DIR               /opt/ohpc/pub/WRFDA-4DVAR/work_dir
-setenv          OBSPROC_DIR		/opt/ohpc/pub/WRFDA-4DVAR/model/WRFDA/var/obsproc
+setenv          WRFDA_ROOT              $ROOT_DIR
+setenv          WRFDA_DIR               $ROOT_DIR/work_dir
+setenv          OBSPROC_DIR		$ROOT_DIR/model/WRFDA/var/obsproc
 
-set-alias	download-obs		"python3 /opt/ohpc/pub/syseng-hpc/scripts/download-obs.py"
-set-alias	download-prep		"python3 /opt/ohpc/pub/syseng-hpc/scripts/download-prep.py"
-set-alias	download-obs		"python3 /opt/ohpc/pub/syseng-hpc/scripts/download-obs.py"
-set-alias	run-obsproc		"python3 /opt/ohpc/pub/syseng-hpc/scripts/run-obsproc.py"
+set-alias	download-obs		"python3 /work/syseng/pub/syseng-hpc/scripts/download-obs.py"
+set-alias	download-prep		"python3 /work/syseng/pub/syseng-hpc/scripts/download-prep.py"
+set-alias	download-obs		"python3 /work/syseng/pub/syseng-hpc/scripts/download-obs.py"
+set-alias	run-obsproc		"python3 /work/syseng/pub/syseng-hpc/scripts/run-obsproc.py"
 
 EOL
 
 echo "Setting permissions..."
 
 chgrp -R syseng $ROOT_DIR
-chmod -R 777 $ROOT_DIR
+chmod -R 775 $ROOT_DIR
 
 echo "DONE! WRFDA-4.0 installed successfully"

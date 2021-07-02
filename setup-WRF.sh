@@ -6,12 +6,12 @@
 #
 
 # Install and update low level dependencies
-sudo yum -y update
-sudo yum -y upgrade
-sudo yum -y install wget gcc gcc-gfortran gcc-c++ libtool automake autoconf make m4 java-11-openjdk csh
+# sudo yum -y update
+# sudo yum -y upgrade
+sudo yum -y install wget gcc gcc-gfortran gcc-c++ libtool automake autoconf make m4 java-11-openjdk csh jasper-devel
 
 ## Dir structure
-export ROOT_DIR="/opt/ohpc/pub/WRF_Model"
+export ROOT_DIR="/work/syseng/pub/WRF_Model"
 mkdir -p $ROOT_DIR/downloads
 mkdir -p $ROOT_DIR/model
 
@@ -164,9 +164,8 @@ mkdir $ROOT_DIR/model/WRFDomainWizard
 unzip $ROOT_DIR/downloads/WRFDomainWizard.zip -d $ROOT_DIR/model/WRFDomainWizard
 chmod +x $ROOT_DIR/model/WRFDomainWizard/run_DomainWizard
 
-echo "Writting scripts..."
-git clone https://github.com/AML-CS/syseng-hpc.git
-export PATH=/opt/ohpc/pub/syseng-hpc/scripts:$PATH
+echo "Adding scripts to PATH..."
+export PATH=/work/syseng/pub/syseng-hpc/scripts:$PATH
 
 echo "Writting modulefile..."
 
@@ -189,41 +188,45 @@ module-whatis "URL https://github.com/wrf-model/WRF"
 
 set             version                 4.2.0
 
-prepend-path    PATH                    /opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/opt/ohpc/pub/WRF_Model/Library/bin:/root/install/WRF_Model/Library/bin:/opt/ohpc/pub/apps/miniconda/4.8.3/condabin:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/bin:/opt/ohpc/pub/compiler/gcc/8.3.0/bin:/opt/ohpc/pub/utils/prun/1.3:/opt/ohpc/pub/utils/autotools/bin:/opt/ohpc/pub/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/var/lib/snapd/snap/bin:/root/bin:/opt/ohpc/pub/syseng-hpc/scripts
-prepend-path    LD_LIBRARY_PATH         /opt/ohpc/pub/WRF_Model/Library/lib:/opt/ohpc/pub/WRF_Model/Library/lib:/opt/ohpc/pub/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/lib:/opt/ohpc/pub/compiler/gcc/8.3.0/lib64
+prepend-path    PATH                    $PATH
+prepend-path    LD_LIBRARY_PATH         $LD_LIBRARY_PATH
 
 setenv          CC                      gcc
 setenv          CXX                     g++
 setenv          FC                      gfortran
 setenv          F77                     gfortran
 
-setenv          HDF5                    /opt/ohpc/pub/WRF_Model/Library
-setenv          LD_LIBRARY_PATH         /opt/ohpc/pub/WRF_Model/Library/lib:/opt/ohpc/pub/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/root/install/WRF_Model/Library/lib:/opt/ohpc/pub/mpi/openmpi3-gnu8/3.1.4/lib:/opt/ohpc/pub/compiler/gcc/8.3.0/lib64
+setenv          HDF5                    $ROOT_DIR/Library
+setenv          LD_LIBRARY_PATH         $LD_LIBRARY_PATH
 
-setenv          CPPFLAGS                -I/opt/ohpc/pub/WRF_Model/Library/include
-setenv          LDFLAGS                 -L/opt/ohpc/pub/WRF_Model/Library/lib
+setenv          CPPFLAGS                -I$ROOT_DIR/Library/include
+setenv          LDFLAGS                 -L$ROOT_DIR/Library/lib
 
-setenv          NETCDF                  /opt/ohpc/pub/WRF_Model/Library
+setenv          NETCDF                  $ROOT_DIR/Library
 
 setenv          LIBS                    -lnetcdf -lhdf5_hl -lhdf5 -lz
 
-setenv          JASPERLIB               /opt/ohpc/pub/WRF_Model/Library/lib
-setenv          JASPERINC               /opt/ohpc/pub/WRF_Model/Library/include
+setenv          JASPERLIB               $ROOT_DIR/Library/lib
+setenv          JASPERINC               $ROOT_DIR/Library/include
 
-setenv          NAMELISTS_DIR           /opt/ohpc/pub/syseng-hpc/namelists
-setenv          BIN_DIR	                /opt/ohpc/pub/syseng-hpc/scripts
-setenv          WRF_ROOT_DIR            /opt/ohpc/pub/WRF_Model
-setenv          WRF_DIR                 /opt/ohpc/pub/WRF_Model/model/WRF-4.2
-setenv          WPS_DIR                 /opt/ohpc/pub/WRF_Model/model/WPS-4.2
-setenv          GEOG_DATA_PATH          /opt/ohpc/pub/WRF_Model/data/WPS_GEOG
-setenv          REAL_DATA_PATH          /opt/ohpc/pub/WRF_Model/data/WPS_REAL
-setenv          ARW_POST                /opt/ohpc/pub/WRF_Model/model/ARWpost
+setenv          NAMELISTS_DIR           /work/syseng/pub/syseng-hpc/namelists
+setenv          BIN_DIR	                /work/syseng/pub/syseng-hpc/scripts
+setenv          WRF_ROOT_DIR            $ROOT_DIR
+setenv          WRF_DIR                 $ROOT_DIR/model/WRF-4.2
+setenv          WPS_DIR                 $ROOT_DIR/model/WPS-4.2
+setenv          GEOG_DATA_PATH          $ROOT_DIR/data/WPS_GEOG
+setenv          REAL_DATA_PATH          $ROOT_DIR/data/WPS_REAL
+setenv          ARW_POST                $ROOT_DIR/model/ARWpost
+
+set-alias       download-grib	        "python3 /work/syseng/pub/syseng-hpc/scripts/download-grib.py"
 
 EOL
 
 echo "Setting permissions..."
 
 chgrp -R syseng $ROOT_DIR
-chmod -R 777 $ROOT_DIR
+chmod -R 775 $ROOT_DIR
 
 echo "DONE! WRF-4.2.0 installed successfully"
+echo "NOTE: make sure to have/download WRF Preprocessing System (WPS) Geographical Input Data Mandatory Fields"
+echo "(help) run download-geog-data"

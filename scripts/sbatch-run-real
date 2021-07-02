@@ -15,4 +15,4 @@ export OMP_NUM_THREADS=1
 cd $WRF_DIR/run
 
 # mpiexec ./real.exe 
-srun --mpi=pmi2 ./wrf.exe > stdout.log 2>&1
+srun --mpi=pmi2 ./wrf.exe

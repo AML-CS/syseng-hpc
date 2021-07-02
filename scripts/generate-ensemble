@@ -32,8 +32,8 @@ function usage() {
 
 PREFIX="m"
 DIRECTORY="$(pwd)"
-DOMAINS=3
-WRFDA_PROCESSORS=32
+DOMAINS=1
+WRFDA_PROCESSORS=16
 
 while true; do
  case "$1" in
@@ -109,6 +109,7 @@ for (( i=${START}; i<=$N; i++ )); do
     run-wrf --only-real -d $DOMAINS
     sed -i "s/^[[:space:]]*seed_array2.*/seed_array2=${i}/" $NAMELIST_FILE
     print_msg "\nPerturbing initial condition..."
+    ulimit -Hc 
     run-wrfda -f "$FROM" -t "$TO" -h $HOURS -p $WRFDA_PROCESSORS
     if [[ -f wrfvar_output ]]; then
         print_msg "\nUpdating boundary conditions..."
