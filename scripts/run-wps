@@ -91,7 +91,7 @@ if [[ -n $FROM ]]; then
     FROM=$(date --date="${FROM}" +%Y-%m-%d_%H:%M:%S)
     case $DOMAINS in
         1)
-            sed -i "s/start_date.*/start_date = '$FROM',/" $NAMELIST_FILE 
+            sed -i "s/start_date.*/start_date = '$FROM',/" $NAMELIST_FILE
             ;;
         2)
             sed -i "s/start_date.*/start_date = '$FROM','$FROM',/" $NAMELIST_FILE
@@ -107,7 +107,7 @@ if [[ -n $TO ]]; then
     TO=$(date --date="${TO}" +%Y-%m-%d_%H:%M:%S)
     case $DOMAINS in
         1)
-            sed -i "s/end_date.*/end_date = '$TO',/" $NAMELIST_FILE 
+            sed -i "s/end_date.*/end_date = '$TO',/" $NAMELIST_FILE
             ;;
         2)
             sed -i "s/end_date.*/end_date = '$TO','$TO',/" $NAMELIST_FILE
@@ -124,6 +124,8 @@ if [[ -n $SECONDS ]]; then
     print_msg "Inverval seconds: ${SECONDS}" -cmagenta
 fi
 
+rm -rf GRIBFILE* 2> /dev/null
+rm -rf PFILE* 2> /dev/null
 rm -rf met_em* 2> /dev/null
 
 # Geogrid
@@ -146,4 +148,3 @@ check_success ungrib
 print_msg "\nRunning metgrid..."
 ./metgrid.exe >& metgrid.log
 check_success metgrid
-

@@ -86,5 +86,5 @@ for file in filelist:
     check_file_status(file_base, filesize)
 
 Path('real-data').mkdir(parents=True, exist_ok=True)
-os.system(f"mv *.grib2 real-data")
-print("Observations saved in ./real-data!")
+os.system("mv *.grib2 $DATA_DIR/real-data")
+print("Observations saved in $DATA_DIR/real-data!")

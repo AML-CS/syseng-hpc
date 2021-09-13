@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 #
-# Setup and build WRF 4.2 as module
+# Setup and build WRF 4.3 as module
 # Tested in Centos 7, Uninorte HPC
 # Author: sjdonado@uninorte.edu.co
 #
@@ -8,39 +8,42 @@
 # Install and update low level dependencies
 # sudo yum -y update
 # sudo yum -y upgrade
-sudo yum -y install wget gcc gcc-gfortran gcc-c++ libtool automake autoconf make m4 java-11-openjdk csh jasper-devel
+
+# (not required if exists gnu8 module)
+# sudo yum -y install wget gcc gcc-gfortran libtool automake autoconf make m4 java-11-openjdk csh
+
+module purge
+module load autotools ohpc gnu8/8.3.0 cmake/3.15.4
+
+# sudo yum-config-manager --enable epel
+# sudo yum -y install libgfortran5 mesa-libGL-devel
 
 ## Dir structure
-export ROOT_DIR="/work/syseng/pub/WRF_Model"
+export ROOT_DIR="/work/syseng/pub/WRFV4.3"
 mkdir -p $ROOT_DIR/downloads
 mkdir -p $ROOT_DIR/model
+mkdir -p $ROOT_DIR/data
 
-############################ WRF 4.2 ###################################
-## Install dependencies
-########################################################################
-
+## Download dependencies
 cd $ROOT_DIR/downloads
-wget -c http://cola.gmu.edu/grads/2.2/grads-2.2.0-bin-centos7.3-x86_64.tar.gz
-wget -c https://www.zlib.net/zlib-1.2.11.tar.gz
-wget -c https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.5/src/hdf5-1.10.5.tar.gz
-wget -c -O netcdf-c-4.7.1.tar.gz https://github.com/Unidata/netcdf-c/archive/v4.7.1.tar.gz
-#wget -c https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-c-4.7.1.tar.gz
-wget -c https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-fortran-4.5.1.tar.gz
-wget -c http://www.mpich.org/static/downloads/3.3.1/mpich-3.3.1.tar.gz
-wget -c https://download.sourceforge.net/libpng/libpng-1.6.37.tar.gz
-wget -c https://www.ece.uvic.ca/~frodo/jasper/software/jasper-1.900.1.zip
+# wget -c http://cola.gmu.edu/grads/2.2/grads-2.2.0-bin-centos7.3-x86_64.tar.gz
+# wget -c https://www.zlib.net/zlib-1.2.11.tar.gz
+# wget -c https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.gz
+# wget -c https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.8.1.tar.gz -O netcdf-c-4.8.1.tar.gz
+# wget -c https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.5.3.tar.gz -O netcdf-fortran-4.5.3.tar.gz
+# wget -c https://download.sourceforge.net/libpng/libpng-1.6.37.tar.gz
+# wget -c https://github.com/jasper-software/jasper/archive/refs/tags/version-2.0.33.tar.gz -O jasper-version-2.0.33.tar.gz
+# wget -c https://github.com/wrf-model/WRF/archive/refs/tags/v4.3.tar.gz -O WRF-4.3.tar.gz
+# wget -c https://github.com/wrf-model/WPS/archive/refs/tags/v4.3.tar.gz -O WPS-4.3.tar.gz
 
 # Compilers env flags
-export DIR=$ROOT_DIR/Library
+export DIR=$ROOT_DIR/library
 export CC=gcc
 export CXX=g++
 export FC=gfortran
 export F77=gfortran
-
-# Setup Grads 2.2.0
-tar -xvzf $ROOT_DIR/downloads/grads-2.2.0-bin-centos7.3-x86_64.tar.gz -C $ROOT_DIR/downloads
-mv $ROOT_DIR/downloads/grads-2.2.0/bin/* $DIR/bin
-mv $ROOT_DIR/downloads/grads-2.2.0/lib/* $DIR/lib
+# export WRFIO_NCD_LARGE_FILE_SUPPORT=1
+# export J="-j 1"
 
 # Setup zlib 1.2.11
 tar -xvzf $ROOT_DIR/downloads/zlib-1.2.11.tar.gz -C $ROOT_DIR/downloads
@@ -49,102 +52,107 @@ cd $ROOT_DIR/downloads/zlib-1.2.11/
 make
 make install
 
-# Setup hdf5 library for netcdf4 functionality
-tar -xvzf $ROOT_DIR/downloads/hdf5-1.10.5.tar.gz -C $ROOT_DIR/downloads
-cd $ROOT_DIR/downloads/hdf5-1.10.5
+export ZLIB=$DIR
+
+# Installing HDF5 1.12.1
+tar -xvzf $ROOT_DIR/downloads/hdf5-1.12.1.tar.gz -C $ROOT_DIR/downloads
+cd $ROOT_DIR/downloads/hdf5-1.12.1
 ./configure --prefix=$DIR --with-zlib=$DIR --enable-hl --enable-fortran
-make check
+make
 make install
 
 export HDF5=$DIR
-export LD_LIBRARY_PATH=$DIR/lib:$LD_LIBRARY_PATH
 
-## Setup netcdf-c-4.7.1
-tar -xzvf $ROOT_DIR/downloads/netcdf-c-4.7.1.tar.gz -C $ROOT_DIR/downloads
-cd $ROOT_DIR/downloads/netcdf-c-4.7.1/
-
-export CPPFLAGS=-I$DIR/include
+export LD_LIBRARY_PATH=$DIR/lib
 export LDFLAGS=-L$DIR/lib
-./configure --prefix=$DIR --disable-dap
+export CPPFLAGS=-I$DIR/include
 
-make check
-make install
-
-export PATH=$DIR/bin:$PATH
-export NETCDF=$DIR
-
-## Setup netcdf-fortran-4.5.1
-tar -xvzf $ROOT_DIR/downloads/netcdf-fortran-4.5.1.tar.gz -C $ROOT_DIR/downloads
-cd $ROOT_DIR/downloads/netcdf-fortran-4.5.1/
-export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz" 
-
-./configure --prefix=$DIR --disable-shared
-make check
-make install
-
-## Setup mpich-3.3.1
-tar -xvzf $ROOT_DIR/downloads/mpich-3.3.1.tar.gz -C $ROOT_DIR/downloads
-cd $ROOT_DIR/downloads/mpich-3.3.1/
+# Installing netcdf-c-4.8.1
+tar -xvzf $ROOT_DIR/downloads/netcdf-c-4.8.1.tar.gz -C $ROOT_DIR/downloads
+cd $ROOT_DIR/downloads/netcdf-c-4.8.1
 ./configure --prefix=$DIR
-make
+make check
 make install
 
+export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz"
+
+# Installing netcdf-fortran-4.5.3
+tar -xvzf $ROOT_DIR/downloads/netcdf-fortran-4.5.3.tar.gz -C $ROOT_DIR/downloads
+cd $ROOT_DIR/downloads/netcdf-fortran-4.5.3
+./configure --prefix=$DIR
+make check
+make install
+
+export NETCDF=$DIR
 export PATH=$DIR/bin:$PATH
+
+############################ WRF 4.3 ###################################
+
+# Setup WRF-4.3
+tar -xvzf $ROOT_DIR/downloads/WRF-4.3.tar.gz -C $ROOT_DIR/model
+cd $ROOT_DIR/model/WRF-4.3
+./clean -a
+./configure # 34, 1 for gfortran and distributed memory
+
+./compile em_real >& compile.out
+
+echo "If compilation was successful, you should see wrf.exe"
+ls -l main/*.exe
+if [ ! -f main/wrf.exe ]; then
+    echo "wrf.exe not found"
+    exit 1
+fi
+
+export WRF_DIR=$ROOT_DIR/model/WRF-4.3
+
+exit 0
+
+############################ WPS 4.3 ###################################
 
 # Setup libpng-1.6.37
 tar -xvzf $ROOT_DIR/downloads/libpng-1.6.37.tar.gz -C $ROOT_DIR/downloads
-cd $ROOT_DIR/downloads/libpng-1.6.37/
+cd $ROOT_DIR/downloads/libpng-1.6.37
 ./configure --prefix=$DIR
 make
 make install
 
-# Setup jasper-1.900.1
-mkdir $ROOT_DIR/downloads/jasper-1.900.1
-unzip $ROOT_DIR/downloads/jasper-1.900.1.zip
-cd $ROOT_DIR/downloads/jasper-1.900.1
-autoreconf -i
-./configure --prefix=$DIR
-make
+# Setup jasper-version-2.0.33
+tar -xvzf $ROOT_DIR/downloads/jasper-version-2.0.33.tar.gz -C $ROOT_DIR/downloads
+cd $ROOT_DIR/downloads/jasper-version-2.0.33
+export JASPER_BUILD_DIR=$ROOT_DIR/downloads/jasper-version-2.0.33-build
+mkdir -p $JASPER_BUILD_DIR
+cmake -G "Unix Makefiles" -H$(pwd) -B$JASPER_BUILD_DIR -DCMAKE_INSTALL_PREFIX=$DIR
+cd $JASPER_BUILD_DIR
+make clean all
+make test
 make install
+mv $DIR/lib64/* $DIR/lib
+rmdir $DIR/lib64
+
 export JASPERLIB=$DIR/lib
 export JASPERINC=$DIR/include
 
-############################ WRF 4.2 ###################################
-## Build model
-## Downloaded from git tagged releases
-########################################################################
-
-# Setup WRFV4.2
-cd $ROOT_DIR/downloads
-wget -c https://github.com/wrf-model/WRF/archive/v4.2.tar.gz
-tar -xvzf $ROOT_DIR/downloads/v4.2.tar.gz -C $ROOT_DIR/model
-# cp -R $ROOT_DIR/model/WRF-4.2 $ROOT_DIR/model/WRF-4.2-real
-# cp -R $ROOT_DIR/model/WRF-4.2 $ROOT_DIR/model/WRF-4.2-ideal
-
-# Compile WRF-4.2
-cd $ROOT_DIR/model/WRF-4.2
+# Setup WPSV4.3
+tar -xvzf $ROOT_DIR/downloads/WPS-4.3.tar.gz -C $ROOT_DIR/model
+cd $ROOT_DIR/model/WPS-4.3
 ./clean
-./configure # 34, 1 for gfortran and distributed memory
-./compile em_real
-
-echo "If compilation was successful, you should see wrf.exe and real.exe"
-ls -l *exe
-
-export WRF_DIR=$ROOT_DIR/model/WRF-4.2
-
-# Setup WPSV4.2
-cd $ROOT_DIR/downloads
-wget -c https://github.com/wrf-model/WPS/archive/v4.2.zip
-unzip $ROOT_DIR/downloads/v4.2.zip -d $ROOT_DIR/model
-cd $ROOT_DIR/model/WPS-4.2
-./clean
-./configure #3
-./compile
+./configure # 3
+./compile >& compile.out
 
 echo "If compilation was successful, you should see geogrid.exe, metgrid.exe and ungrib.exe"
-ls -l *exe
+ls -l *.exe
+if [ ! -f geogrid.exe ] || [ ! -f metgrid.exe ] || [ ! -f ungrib.exe ]; then
+    echo "geogrid.exe, metgrid.exe or ungrib.exe not found"
+    exit 1
+fi
 
 ######################## Post-Processing Tools ####################
+
+# Setup Grads 2.2.0
+tar -xvzf $ROOT_DIR/downloads/grads-2.2.0-bin-centos7.3-x86_64.tar.gz -C $ROOT_DIR/downloads
+mv $ROOT_DIR/downloads/grads-2.2.0/bin/* $DIR/bin
+mv $ROOT_DIR/downloads/grads-2.2.0/lib/* $DIR/lib
+
 # Setup ARWpost
 cd $ROOT_DIR/downloads
 wget -c http://www2.mmm.ucar.edu/wrf/src/ARWpost_V3.tar.gz
@@ -152,11 +160,12 @@ tar -xvzf $ROOT_DIR/downloads/ARWpost_V3.tar.gz -C $ROOT_DIR/model
 cd $ROOT_DIR/model/ARWpost
 ./clean
 sed -i -e 's/-lnetcdf/-lnetcdff -lnetcdf/g' $ROOT_DIR/model/ARWpost/src/Makefile
-./configure #3
+./configure # 3
 sed -i -e 's/-C -P/-P/g' $ROOT_DIR/model/ARWpost/configure.arwp
 ./compile
 
 ######################## Model Setup Tools ########################
+
 # Setup DomainWizard
 cd $ROOT_DIR/downloads
 wget -c http://esrl.noaa.gov/gsd/wrfportal/domainwizard/WRFDomainWizard.zip
@@ -170,23 +179,23 @@ export PATH=/work/syseng/pub/syseng-hpc/scripts:$PATH
 echo "Writting modulefile..."
 
 mkdir -p /opt/ohpc/pub/modulefiles/wrf/
-cat > /opt/ohpc/pub/modulefiles/wrf/4.2.0  <<EOL
+cat > /opt/ohpc/pub/modulefiles/wrf/4.3  <<EOL
 #%Module1.0#####################################################################
 
 proc ModulesHelp { } {
-        puts stderr " "
-        puts stderr "This module loads WRF-4.2.0 and dependencies"
-        puts stderr "\nVersion 4.2.0\n"
+    puts stderr " "
+    puts stderr "This module loads WRF-4.3 and dependencies"
+    puts stderr "\nVersion 4.3\n"
 }
 
-module-whatis "Name: wrf/4.2.0"
-module-whatis "Version: 4.2.0"
+module-whatis "Name: wrf/4.3"
+module-whatis "Version: 4.3"
 module-whatis "Category: utility, developer support"
 module-whatis "Keywords: System, Utility"
 module-whatis "The Weather Research and Forecasting (WRF) model"
 module-whatis "URL https://github.com/wrf-model/WRF"
 
-set             version                 4.2.0
+set             version                 4.3
 
 prepend-path    PATH                    $PATH
 prepend-path    LD_LIBRARY_PATH         $LD_LIBRARY_PATH
@@ -196,24 +205,23 @@ setenv          CXX                     g++
 setenv          FC                      gfortran
 setenv          F77                     gfortran
 
-setenv          HDF5                    $ROOT_DIR/Library
-setenv          LD_LIBRARY_PATH         $LD_LIBRARY_PATH
+setenv          HDF5                    $ROOT_DIR/library
 
-setenv          CPPFLAGS                -I$ROOT_DIR/Library/include
-setenv          LDFLAGS                 -L$ROOT_DIR/Library/lib
+setenv          CPPFLAGS                -I$ROOT_DIR/library/include
+setenv          LDFLAGS                 -L$ROOT_DIR/library/lib
 
-setenv          NETCDF                  $ROOT_DIR/Library
+setenv          NETCDF                  $ROOT_DIR/library
 
 setenv          LIBS                    -lnetcdf -lhdf5_hl -lhdf5 -lz
 
-setenv          JASPERLIB               $ROOT_DIR/Library/lib
-setenv          JASPERINC               $ROOT_DIR/Library/include
+setenv          JASPERLIB               $JASPERLIB
+setenv          JASPERINC               $JASPERINC
 
 setenv          NAMELISTS_DIR           /work/syseng/pub/syseng-hpc/namelists
 setenv          BIN_DIR	                /work/syseng/pub/syseng-hpc/scripts
 setenv          WRF_ROOT_DIR            $ROOT_DIR
-setenv          WRF_DIR                 $ROOT_DIR/model/WRF-4.2
-setenv          WPS_DIR                 $ROOT_DIR/model/WPS-4.2
+setenv          WRF_DIR                 $ROOT_DIR/model/WRF-4.3
+setenv          WPS_DIR                 $ROOT_DIR/model/WPS-4.3
 setenv          GEOG_DATA_PATH          $ROOT_DIR/data/WPS_GEOG
 setenv          REAL_DATA_PATH          $ROOT_DIR/data/WPS_REAL
 setenv          ARW_POST                $ROOT_DIR/model/ARWpost
@@ -225,8 +233,7 @@ EOL
 echo "Setting permissions..."
 
 chgrp -R syseng $ROOT_DIR
-chmod -R 775 $ROOT_DIR
+chmod -R 777 $ROOT_DIR
 
-echo "DONE! WRF-4.2.0 installed successfully"
-echo "NOTE: make sure to have/download WRF Preprocessing System (WPS) Geographical Input Data Mandatory Fields"
-echo "(help) run download-geog-data"
+echo "WRF-4.3 installed successfully!"
+echo "IMPORTANT: Download WRF Preprocessing System (WPS) Geographical Input Data Mandatory Fields using ./download-geog-data"

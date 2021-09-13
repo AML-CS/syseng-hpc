@@ -32,7 +32,7 @@ def check_file_status(filepath, filesize):
 def daterange(start_date, end_date):
     for n in range(int((end_date - start_date).days)+1):
         yield start_date + timedelta(n)
-            
+
 def pad_zero(idx):
     if idx < 10:
         return f"0{idx}"
@@ -64,7 +64,7 @@ if __name__ == '__main__':
 
     start_date = datetime.strptime(sys.argv[1], '%Y-%m-%d')
     end_date = datetime.strptime(sys.argv[2], '%Y-%m-%d')
-    date_range = daterange(start_date, end_date) 
+    date_range = daterange(start_date, end_date)
 
     dspath = 'https://rda.ucar.edu/data/ds337.0/'
     filelist = [('tarfiles/{0:%Y}/prepbufr.{0:%Y}{0:%m}{0:%d}.nr.tar.gz'.format(date), date) for date in date_range]
@@ -85,16 +85,7 @@ if __name__ == '__main__':
         check_file_status(file_base, filesize)
 
         filename="prepbufr.{0:%Y}{0:%m}{0:%d}.nr.tar.gz".format(date)
-        folder="{0:%Y}{0:%m}{0:%d}.nr".format(date)
-        os.system(f"tar xzf {filename}")
-        os.system(f"mv {folder}/* prep-data && rm -rf {folder}")
-        os.system(f"rm {filename}")
-        print(f"{filename} unziped and saved in ./prep-data!")
-    
-    os.system('cd $WRFDA_DIR && rm -rf ob*.bufr')
-    for idx, filename in enumerate(glob.glob(f"{os.getcwd()}/prep-data/*")):
-        linkname = f"ob{pad_zero(idx+1)}.bufr"
-        os.system(f"chmod 777 {filename}")
-        os.system(f"cd $WRFDA_DIR && ln -s {filename} {linkname}")
-    
-    print("Symbolic links created successfully!")
+        os.system(f"tar -xzf {filename} -C $DATA_DIR/prep-data")
+        # os.system(f"mv {folder}/* prep-data")
+        # os.system(f"rm {filename}")
+        print(f"{filename} unziped and saved in $DATA_DIR/prep-data!")

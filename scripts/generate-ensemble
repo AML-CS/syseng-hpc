@@ -94,23 +94,26 @@ cd $WRFDA_DIR
 
 NAMELIST_FILE=$NAMELISTS_DIR/namelist-wrfda.input
 
+$BIN_DIR/link-wrfda-prep-data.py
+
 print_msg "Running simulation..."
 
-timestamp=$(date +%Y-%m-%d_%H:%M:%S)
-DIRECTORY="${DIRECTORY}/wrfdaout_${timestamp}"
-mkdir -p $DIRECTORY
-chmod 777 $DIRECTORY
+# timestamp=$(date +%Y-%m-%d_%H:%M:%S)
+# DIRECTORY="${DIRECTORY}/baq-1km-ensemble"
+# mkdir -p $DIRECTORY
+# chmod 777 $DIRECTORY
 
-run-wrf -i $INTERVAL -f "$FROM" -t "$TO" -d $DOMAINS --output ${DIRECTORY}/original
+# run-wrf --only-real -i $INTERVAL -f "$FROM" -t "$TO"  --output ${DIRECTORY}/original
+# run-wrf --only-wrf -i $INTERVAL -f "$FROM" -t "$TO"  --output ${DIRECTORY}/original
 
 for (( i=${START}; i<=$N; i++ )); do
     print_msg "\nMember ${i}" -cmagenta
     print_msg "Generating first initial condition..."
-    run-wrf --only-real -d $DOMAINS
+    run-wrf --only-real
     sed -i "s/^[[:space:]]*seed_array2.*/seed_array2=${i}/" $NAMELIST_FILE
     print_msg "\nPerturbing initial condition..."
-    ulimit -Hc 
-    run-wrfda -f "$FROM" -t "$TO" -h $HOURS -p $WRFDA_PROCESSORS
+    ulimit -Hc
+    run-wrfda -f "$FROM" -t "$TO" -h $HOURS
     if [[ -f wrfvar_output ]]; then
         print_msg "\nUpdating boundary conditions..."
         ./da_update_bc.exe >& update.out
@@ -122,4 +125,4 @@ for (( i=${START}; i<=$N; i++ )); do
     fi
 done
 
-print_msg "\nFinished!" -cgreen 
+print_msg "\nFinished!" -cgreen

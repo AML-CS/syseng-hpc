@@ -159,13 +159,16 @@ rm -f met_em*
 rm -f stdout.log
 ln -sf ${WPS_DIR}/met_em* .
 
+$BIN_DIR/link-wrf-real-data.py
+
 if ${REAL}
 then
     rm -f wrfinput_d* 2> /dev/null
-    rm -f wrfbdy_d* 2> /dev/null 
+    rm -f wrfbdy_d* 2> /dev/null
     print_msg "Running real.exe with ${REAL_PROCESSORS} processors"
-    # time sbatch run-real-sbatch
-    time mpirun -np ${REAL_PROCESSORS} ./real.exe > stdout.log 2>&1
+    # time mpirun -np ${REAL_PROCESSORS} ./real.exe > stdout.log 2>&1
+    # time mpirun -n 32 ./real.exe > stdout.log 2>&1
+    time srun -n 1 --mpi=pmi2 ./real.exe
     if [ ! -f wrfbdy_d* ]; then
         print_msg "An error ocurred while running WRF real.exe" -cred
         cat rsl.error.0000
@@ -177,15 +180,15 @@ if ${WRF}
 then
     rm -rf ${WRF_DIR}/run/wrfout* 2> /dev/null
     print_msg "\nRunning wrf.exe with ${WRF_PROCESSORS} processors"
-    # time sbatch run-wrf-sbatch
-    time mpirun -np ${WRF_PROCESSORS} ./wrf.exe > stdout.log 2>&1
+    # time mpirun -np ${WRF_PROCESSORS} ./wrf.exe > stdout.log 2>&1
+    # time mpirun -n 32 ./wrf.exe > stdout.log 2>&1
+    time srun -n 16 --mpi=pmi2 ./wrf.exe
     if [ ! -f wrfout* ]; then
         print_msg "An error ocurred while running WRF" -cred
         cat rsl.error.0000
         exit 1
     fi
     chmod 777 wrfout* 2> /dev/null
-    #cd ${DIR}
     cp ${WRF_DIR}/run/wrfout* ${DESTINATION}
     grep "SUCCESS COMPLETE WRF" "rsl.error.0000" > /dev/null
     if [[ $? -eq 0 ]]; then

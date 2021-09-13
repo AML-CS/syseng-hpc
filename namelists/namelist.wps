@@ -1,8 +1,8 @@
 &share
  wrf_core = 'ARW',
  max_dom = 1,
- start_date = '2020-01-01_00:00:00',
- end_date = '2020-01-02_18:00:00',
+ start_date = '2021-01-01_00:00:00',
+ end_date = '2021-01-02_06:00:00',
  interval_seconds = 21600,
  io_form_geogrid = 2,
 /
@@ -23,7 +23,7 @@
  truelat1  = 10.968,
  truelat2  = 10.968,
  stand_lon = -74.781,
- geog_data_path = '/work/syseng/pub/WRF_Model/data/WPS_GEOG/'
+ geog_data_path = '/work/syseng/pub/WRFV4.3/data/WPS_GEOG/'
  ref_x = 50.0,
  ref_y = 37.5,
 /
@@ -35,5 +35,5 @@
 
 &metgrid
  fg_name = 'FILE'
- io_form_metgrid = 2, 
+ io_form_metgrid = 2,
 /

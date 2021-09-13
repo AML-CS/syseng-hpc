@@ -3,13 +3,13 @@ run_days                 = 0,
 run_hours                = 0,
 run_minutes              = 0,
 run_seconds              = 0,
-start_year = 2020,2020,2020,
+start_year = 2021,2021,2021,
 start_month = 01,01,01,
 start_day = 01,01,01,
 start_hour = 00,00,00,
 start_minute             = 00,
 start_second             = 00,
-end_year = 2020,2020,2020,
+end_year = 2021,2021,2021,
 end_month = 01,01,01,
 end_day = 01,01,01,
 end_hour = 06,06,06,
@@ -18,7 +18,7 @@ end_second               = 00,
 interval_seconds = 21600,
 input_from_file          = .true.,
 history_interval         = 60,
-frames_per_outfile       = 1000,
+frames_per_outfile       = 1,
 restart                  = .false.,
 restart_interval         = 720,
 io_form_history          = 2,
@@ -74,8 +74,8 @@ hypsometric_opt          = 1,
 &fdda
 /
 
- &dynamics
- hybrid_opt                          = 2, 
+&dynamics
+ hybrid_opt                          = 0,
  w_damping                           = 0,
  diff_opt                            = 1,      1,      1,
  km_opt                              = 4,      4,      4,
@@ -88,20 +88,21 @@ hypsometric_opt          = 1,
  khdif                               = 0,      0,      0,
  kvdif                               = 0,      0,      0,
  non_hydrostatic                     = .true., .true., .true.,
- moist_adv_opt                       = 1,      1,      1,     
- scalar_adv_opt                      = 1,      1,      1,     
+ moist_adv_opt                       = 1,      1,      1,
+ scalar_adv_opt                      = 1,      1,      1,
  gwd_opt                             = 1,      1,      0,
- /
+ use_theta_m												 = 0,
+/
 
- &bdy_control
+&bdy_control
  spec_bdy_width                      = 5,
  specified                           = .true.
- /
+/
 
- &grib2
- /
+&grib2
+/
 
- &namelist_quilt
+&namelist_quilt
  nio_tasks_per_group = 0,
  nio_groups = 1,
- /
+/

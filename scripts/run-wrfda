@@ -77,8 +77,8 @@ if [[ -n $FROM ]]; then
     sed -i "s/start_hour.*/start_hour = $HOUR,/" $NAMELIST_FILE
 
     FROM=$(date --date="${FROM}" +%Y-%m-%d_%H:%M:%S)
-    sed -i "s/analysis_date.*/analysis_date= '$FROM',/" $NAMELIST_FILE 
-    sed -i "s/time_window_min.*/time_window_min= '$FROM',/" $NAMELIST_FILE 
+    sed -i "s/analysis_date.*/analysis_date= '$FROM',/" $NAMELIST_FILE
+    sed -i "s/time_window_min.*/time_window_min= '$FROM',/" $NAMELIST_FILE
 
     print_msg "Time window min: ${FROM}" -cmagenta
 fi
@@ -95,27 +95,28 @@ if [[ -n $TO ]]; then
     sed -i "s/end_hour.*/end_hour = $HOUR,/" $NAMELIST_FILE
 
     TO=$(date --date="${TO}" +%Y-%m-%d_%H:%M:%S)
-    sed -i "s/time_window_max.*/time_window_max= '$TO',/" $NAMELIST_FILE 
+    sed -i "s/time_window_max.*/time_window_max= '$TO',/" $NAMELIST_FILE
 
     print_msg "Time window end: ${TO}" -cmagenta
 fi
 
-rm -f wrfinput_d* 
+rm -f wrfinput_d*
 rm -f wrfbdy_d*
-rm -f wrfvar_output 
+rm -f wrfvar_output
+rm -f rsl.*
 
-cp $WRF_DIR/run/wrfbdy_d01 . 
+cp $WRF_DIR/run/wrfbdy_d01 .
 ln -sf $WRF_DIR/run/wrfinput_d01 .
 ln -sf wrfinput_d01 fg
 
 # ulimit -s unlimited
-
 print_msg "Running wrfda with ${PROCESSORS} processors" -cmagenta
 
-time mpirun -n ${PROCESSORS} ./da_wrfvar.exe > stdout.log 2>&1
+time mpirun -n 32 ./da_wrfvar.exe > stdout.log 2>&1
+# time srun -n 1 --mpi=pmi2 ./da_wrfvar.exe
 
 if [ ! -f wrfvar_output ]; then
     print_msg "An error ocurred while running WRFDA" -cred
-    tail -40 rsl.error.0000
+    tail rsl.error.*
     exit 1
 fi

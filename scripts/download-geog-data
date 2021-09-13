@@ -4,11 +4,7 @@
 # More info: https://aml-cs.github.io
 #
 
-mkdir -p $WRF_ROOT_DIR/data
+wget -c https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_high_res_mandatory.tar.gz -P $WRF_ROOT_DIR/downloads
 
-cd $WRF_ROOT_DIR/downloads
-curl https://www2.mmm.ucar.edu/wrf/src/wps_files/geog_high_res_mandatory.tar.gz -o .
-# chmod 775 geog_high_res_mandatory.tar.gz
-
-tar -zxvf geog_high_res_mandatory.tar.gz -C $WRF_ROOT_DIR/data
+tar -zxvf $WRF_ROOT_DIR/downloads/geog_high_res_mandatory.tar.gz -C $WRF_ROOT_DIR/data
 chmod -R 775 $WRF_ROOT_DIR/data/WPS_GEOG

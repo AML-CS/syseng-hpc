@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+#SBATCH --job-name=test
+#SBATCH --output=res.txt
+#SBATCH --
+#SBATCH --ntasks=4
+#SBATCH --time=10:00
+#SBATCH --mem-per-cpu=100
+
+module load OpenMPI
+mpicc wiki_mpi_example.c -o hello.mpi
+srun hello.mpi
