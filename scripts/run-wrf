@@ -159,8 +159,6 @@ rm -f met_em*
 rm -f stdout.log
 ln -sf ${WPS_DIR}/met_em* .
 
-$BIN_DIR/link-wrf-real-data.py
-
 if ${REAL}
 then
     rm -f wrfinput_d* 2> /dev/null
@@ -182,7 +180,7 @@ then
     print_msg "\nRunning wrf.exe with ${WRF_PROCESSORS} processors"
     # time mpirun -np ${WRF_PROCESSORS} ./wrf.exe > stdout.log 2>&1
     # time mpirun -n 32 ./wrf.exe > stdout.log 2>&1
-    time srun -n 16 --mpi=pmi2 ./wrf.exe
+    time srun -n 1 --mpi=pmi2 ./wrf.exe
     if [ ! -f wrfout* ]; then
         print_msg "An error ocurred while running WRF" -cred
         cat rsl.error.0000

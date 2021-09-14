@@ -6,7 +6,8 @@
 #
 
 # Load dependencies
-module load gnu8/8.3.0 openmpi3/3.1.4 wrf/4.3
+module purge
+module load autotools prun/1.3 gnu8/8.3.0 openmpi3/3.1.4 ohpc wrf/4.3
 
 ## Dir structure
 export ROOT_DIR="/work/syseng/pub/WRFDA-4DVARV4.3"
@@ -100,10 +101,10 @@ setenv          WRFPLUS_DIR             $ROOT_DIR/model/WRFPLUSV4
 setenv          WRFDA_DIR               $ROOT_DIR/work-dir
 setenv          OBSPROC_DIR		        $ROOT_DIR/model/WRFDA/var/obsproc
 
-set-alias	    download-obs		    "python3 /work/syseng/pub/syseng-hpc/scripts/download-obs.py"
-set-alias	    download-prep		    "python3 /work/syseng/pub/syseng-hpc/scripts/download-prep.py"
-set-alias	    download-obs		    "python3 /work/syseng/pub/syseng-hpc/scripts/download-obs.py"
-set-alias	    run-obsproc		        "python3 /work/syseng/pub/syseng-hpc/scripts/run-obsproc.py"
+set-alias	    download-obs		    "/work/syseng/pub/syseng-hpc/scripts/download-obs.py"
+set-alias	    download-prep		    "/work/syseng/pub/syseng-hpc/scripts/download-prep.py"
+set-alias	    download-obs		    "/work/syseng/pub/syseng-hpc/scripts/download-obs.py"
+set-alias	    run-obsproc		        "/work/syseng/pub/syseng-hpc/scripts/run-obsproc.py"
 
 EOL
 

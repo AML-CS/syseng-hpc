@@ -148,3 +148,5 @@ check_success ungrib
 print_msg "\nRunning metgrid..."
 ./metgrid.exe >& metgrid.log
 check_success metgrid
+
+ln -sf $WPS_DIR/met_em* $WRF_DIR/run
