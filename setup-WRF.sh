@@ -7,7 +7,7 @@
 
 # Load dependencies
 module purge
-module load autotools prun/1.3 gnu8/8.3.0 openmpi3/3.1.4 ohpc cmake/3.15.4
+module load autotools prun/1.3 gnu8/8.3.0 openmpi3/3.1.4 ohpc cmake/3.15.4 ksh
 
 # Dir structure
 export ROOT_DIR="/work/syseng/pub/WRFV4.3"
@@ -17,15 +17,15 @@ mkdir -p $ROOT_DIR/data
 
 # Download dependencies
 cd $ROOT_DIR/downloads
-# wget -c http://cola.gmu.edu/grads/2.2/grads-2.2.0-bin-centos7.3-x86_64.tar.gz
-# wget -c https://www.zlib.net/zlib-1.2.11.tar.gz
-# wget -c https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.gz
-# wget -c https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.8.1.tar.gz -O netcdf-c-4.8.1.tar.gz
-# wget -c https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.5.3.tar.gz -O netcdf-fortran-4.5.3.tar.gz
-# wget -c https://download.sourceforge.net/libpng/libpng-1.6.37.tar.gz
-# wget -c https://github.com/jasper-software/jasper/archive/refs/tags/version-2.0.33.tar.gz -O jasper-version-2.0.33.tar.gz
-# wget -c https://github.com/wrf-model/WRF/archive/refs/tags/v4.3.tar.gz -O WRF-4.3.tar.gz
-# wget -c https://github.com/wrf-model/WPS/archive/refs/tags/v4.3.tar.gz -O WPS-4.3.tar.gz
+wget -c http://cola.gmu.edu/grads/2.2/grads-2.2.0-bin-centos7.3-x86_64.tar.gz
+wget -c https://www.zlib.net/zlib-1.2.11.tar.gz
+wget -c https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.1/src/hdf5-1.12.1.tar.gz
+wget -c https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.8.1.tar.gz -O netcdf-c-4.8.1.tar.gz
+wget -c https://github.com/Unidata/netcdf-fortran/archive/refs/tags/v4.5.3.tar.gz -O netcdf-fortran-4.5.3.tar.gz
+wget -c https://download.sourceforge.net/libpng/libpng-1.6.37.tar.gz
+wget -c https://github.com/jasper-software/jasper/archive/refs/tags/version-2.0.33.tar.gz -O jasper-version-2.0.33.tar.gz
+wget -c https://github.com/wrf-model/WRF/archive/refs/tags/v4.3.tar.gz -O WRF-4.3.tar.gz
+wget -c https://github.com/wrf-model/WPS/archive/refs/tags/v4.3.tar.gz -O WPS-4.3.tar.gz
 wget -c http://www.mpich.org/static/downloads/3.3.1/mpich-3.3.1.tar.gz
 
 # Compilers env flags
@@ -36,20 +36,20 @@ export FC=gfortran
 export F77=gfortran
 
 # Setup zlib 1.2.11
-# tar -xvzf $ROOT_DIR/downloads/zlib-1.2.11.tar.gz -C $ROOT_DIR/downloads
-# cd $ROOT_DIR/downloads/zlib-1.2.11/
-# ./configure --prefix=$DIR
-# make
-# make install
+tar -xvzf $ROOT_DIR/downloads/zlib-1.2.11.tar.gz -C $ROOT_DIR/downloads
+cd $ROOT_DIR/downloads/zlib-1.2.11/
+./configure --prefix=$DIR
+make
+make install
 
 export ZLIB=$DIR
 
 # Installing HDF5 1.12.1
-# tar -xvzf $ROOT_DIR/downloads/hdf5-1.12.1.tar.gz -C $ROOT_DIR/downloads
-# cd $ROOT_DIR/downloads/hdf5-1.12.1
-# ./configure --prefix=$DIR --with-zlib=$DIR --enable-hl --enable-fortran
-# make
-# make install
+tar -xvzf $ROOT_DIR/downloads/hdf5-1.12.1.tar.gz -C $ROOT_DIR/downloads
+cd $ROOT_DIR/downloads/hdf5-1.12.1
+./configure --prefix=$DIR --with-zlib=$DIR --enable-hl --enable-fortran
+make
+make install
 
 export HDF5=$DIR
 
@@ -58,20 +58,20 @@ export LDFLAGS=-L$DIR/lib
 export CPPFLAGS=-I$DIR/include
 
 # Installing netcdf-c-4.8.1
-# tar -xvzf $ROOT_DIR/downloads/netcdf-c-4.8.1.tar.gz -C $ROOT_DIR/downloads
-# cd $ROOT_DIR/downloads/netcdf-c-4.8.1
-# ./configure --prefix=$DIR
-# make check
-# make install
+tar -xvzf $ROOT_DIR/downloads/netcdf-c-4.8.1.tar.gz -C $ROOT_DIR/downloads
+cd $ROOT_DIR/downloads/netcdf-c-4.8.1
+./configure --prefix=$DIR
+make check
+make install
 
 export LIBS="-lnetcdf -lhdf5_hl -lhdf5 -lz"
 
 # Installing netcdf-fortran-4.5.3
-# tar -xvzf $ROOT_DIR/downloads/netcdf-fortran-4.5.3.tar.gz -C $ROOT_DIR/downloads
-# cd $ROOT_DIR/downloads/netcdf-fortran-4.5.3
-# ./configure --prefix=$DIR
-# make check
-# make install
+tar -xvzf $ROOT_DIR/downloads/netcdf-fortran-4.5.3.tar.gz -C $ROOT_DIR/downloads
+cd $ROOT_DIR/downloads/netcdf-fortran-4.5.3
+./configure --prefix=$DIR
+make check
+make install
 
 export NETCDF=$DIR
 
@@ -222,8 +222,8 @@ setenv          REAL_DATA_PATH          $ROOT_DIR/data/WPS_REAL
 setenv          ARW_POST                $ROOT_DIR/model/ARWpost
 
 set-alias       download-grib	        "/work/syseng/pub/syseng-hpc/scripts/download-grib.py"
-set-alias       run-wps	                "/work/syseng/pub/syseng-hpc/scripts/run-wps.py"
-set-alias       run-wrf	                "/work/syseng/pub/syseng-hpc/scripts/run-wrf.py"
+set-alias       run-wps	                "/work/syseng/pub/syseng-hpc/scripts/run_wps.py"
+set-alias       run-wrf	                "/work/syseng/pub/syseng-hpc/scripts/run_wrf.py"
 
 EOL
 

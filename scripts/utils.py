@@ -24,6 +24,17 @@ def update_namelist(namelist_path, options):
 
 	namelist_file = open(namelist_path, 'w')
 	for (key, value) in options.items():
-		content = re.sub(r'(' + key + r'\s*\=).*,', r'\1 ' + str(value) + ',', content)
+		content = re.sub(r'(' + key + r'\s*\=).*,', r'\g<1> ' + str(value) + ',', content)
 	namelist_file.write(content)
 	namelist_file.close()
+
+def update_env_variables(file_path, env_vars):
+	f = open(file_path)
+	content = f.read()
+	f.close()
+
+	f = open(file_path, 'w')
+	for (key, value) in env_vars.items():
+		content = re.sub(r'(export ' + key + r'=)\S+(.*)', r'\g<1>' + str(value) + r'\g<2>', content)
+	f.write(content)
+	f.close()

@@ -10,7 +10,7 @@ import datetime
 from utils import print_msg, update_namelist
 
 def init_cli():
-    parser = argparse.ArgumentParser(description='Generate WRFDA Background error be.dat')
+    parser = argparse.ArgumentParser(description='Run geogrid + ungrid + metgrid')
 
     parser.add_argument('start_date', metavar='start_date', type=str,
                         help='First perturbation valid date (YYYY-mm-dd H)')
@@ -81,6 +81,7 @@ if __name__ == '__main__':
     print_msg('Success complete', 'okgreen')
 
     print('Running ungrib...')
+    real_data = os.path.abspath(real_data)
     print_msg(f"Using {real_data}", 'warning')
 
     os.system(f"./link_grib.csh {real_data}/*")

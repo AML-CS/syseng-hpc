@@ -105,6 +105,8 @@ set-alias	    download-obs		    "/work/syseng/pub/syseng-hpc/scripts/download-ob
 set-alias	    download-prep		    "/work/syseng/pub/syseng-hpc/scripts/download-prep.py"
 set-alias	    download-obs		    "/work/syseng/pub/syseng-hpc/scripts/download-obs.py"
 set-alias	    run-obsproc		        "/work/syseng/pub/syseng-hpc/scripts/run-obsproc.py"
+set-alias       generate-wrfda-be	    "/work/syseng/pub/syseng-hpc/scripts/generate_wrfda_be.py"
+set-alias       run-wrfda	            "/work/syseng/pub/syseng-hpc/scripts/run_wrfda.py"
 
 EOL
 

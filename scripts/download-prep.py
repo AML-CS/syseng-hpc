@@ -85,7 +85,6 @@ if __name__ == '__main__':
         check_file_status(file_base, filesize)
 
         filename="prepbufr.{0:%Y}{0:%m}{0:%d}.nr.tar.gz".format(date)
-        os.system(f"tar -xzf {filename} -C $DATA_DIR/prep-data")
-        # os.system(f"mv {folder}/* prep-data")
-        # os.system(f"rm {filename}")
-        print(f"{filename} unziped and saved in $DATA_DIR/prep-data!")
+        os.system(f"tar -xzf {filename} -C ./prep-data")
+        os.system(f"rm {filename}")
+        print(f"{filename} unziped and saved in ./prep-data")

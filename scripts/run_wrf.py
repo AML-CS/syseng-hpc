@@ -11,7 +11,7 @@ import datetime
 from utils import print_msg, update_namelist
 
 def init_cli():
-    parser = argparse.ArgumentParser(description='Generate WRFDA Background error be.dat')
+    parser = argparse.ArgumentParser(description='Run WRF real.exe or wrf.exe')
 
     parser.add_argument('start_date', metavar='start_date', type=str,
                         help='First perturbation valid date (YYYY-mm-dd H)')
@@ -45,7 +45,7 @@ def init_cli():
 
     return parser.parse_args()
 
-def call_model(type, wrf_dir, output, ntasks, srun):
+def call_model(type, wrf_dir, ntasks, srun, output=None):
     os.chdir(f"{wrf_dir}/run")
 
     start = time.time()
@@ -78,7 +78,7 @@ def call_model(type, wrf_dir, output, ntasks, srun):
 
     if type == 'wrf':
         os.system('chmod 777 wrfout*')
-        os.system(f"cp wrfout* {output}")
+        os.system(f"cp wrfout* {os.path.abspath(output)}")
 
     print_msg('Success complete', 'okgreen')
     print_msg("{:.3f} seconds".format(time.time() - start), 'okgreen')
@@ -128,7 +128,7 @@ if __name__ == '__main__':
     update_namelist(NAMELIST_FILE, options)
 
     if run_real:
-        call_model('real', WRF_DIR, output, ntasks, srun)
+        call_model('real', WRF_DIR, ntasks, srun)
 
     if run_wrf:
-        call_model('wrf', WRF_DIR, output, ntasks, srun)
+        call_model('wrf', WRF_DIR, ntasks, srun, output)
