@@ -39,7 +39,7 @@ def init_cli():
                         help='Run with srun (inside sbatch or salloc)')
 
     parser.add_argument('-d', '--debug', dest="debug", default=False,
-                        action='store_true', help='Debug mode'))
+                        action='store_true', help='Debug mode')
 
     return parser.parse_args()
 
@@ -120,16 +120,23 @@ if __name__ == '__main__':
 
     output = os.path.abspath(args.output)
 
-    if generate_ensemble > 0:
+    if generate_ensemble > 0:
         start = time.time()
 
         run_wrf.call_model('real', WRF_DIR, 8, srun)
         run_wrf.call_model('wrf', WRF_DIR, ntasks, srun, output=f"{output}/original")
         for i in range(1, generate_ensemble + 1):
             print_msg(f"Member {i}", 'header')
+
             print('Generating first initial condition...')
             run_wrf.call_model('real', WRF_DIR, 8, srun)
-            update_namelist(NAMELIST_FILE, { 'seed_array2': i })
+
+            ensemble_options = {
+                'seed_array1': start_date.strftime('%Y%m%d%H'),
+                'seed_array2': i
+            }
+            update_namelist(NAMELIST_FILE, ensemble_options)
+
             print('Perturbing initial condition...')
             if call_model(WRF_DIR, WRFDA_DIR, ntasks, srun):
                 print('Updating boundary conditions...')

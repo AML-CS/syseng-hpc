@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #
 # Setup and build WRFDA 4.3 as module
 # Tested in Centos 7, Uninorte HPC
