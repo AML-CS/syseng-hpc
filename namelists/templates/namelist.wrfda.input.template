@@ -38,7 +38,7 @@
 /
 
 &wrfvar11
- seed_array1= 2021010600,
+ seed_array1=20200101,
  seed_array2=40
 /
 
@@ -61,7 +61,7 @@
 /
 
 &wrfvar18
- analysis_date= '2021-01-07_00:00:00',
+ analysis_date="2008-02-05_12:00:00.0000",
 /
 
 &wrfvar19
@@ -71,29 +71,29 @@
 /
 
 &wrfvar21
- time_window_min= '2021-01-07_00:00:00',
+ time_window_min="2008-02-05_11:00:00.0000",
 /
 
 &wrfvar22
- time_window_max= '2021-01-08_00:00:00',
+ time_window_max="2008-02-05_13:00:00.0000",
 /
 
 &time_control
- start_year= 2021,
- start_month= 01,
- start_day= 07,
- start_hour= 00,
- end_year= 2021,
- end_month= 01,
- end_day= 08,
- end_hour= 00,
+ start_year=2008,
+ start_month=02,
+ start_day=05,
+ start_hour=12,
+ end_year=2008,
+ end_month=02,
+ end_day=05,
+ end_hour=12,
 /
 
 &fdda
 /
 
 &domains
- time_step                           = 6,
+ time_step                           = 150,
  time_step_fract_num                 = 0,
  time_step_fract_den                 = 1,
  max_dom                             = 1,
@@ -103,8 +103,8 @@
  p_top_requested                     = 5000,
  num_metgrid_levels                  = 34,
  num_metgrid_soil_levels             = 4,
- dx                                  = 1000,
- dy                                  = 1000,
+ dx                                  = 1000, 5000, 1000,
+ dy                                  = 1000, 5000, 1000,
  grid_id                             = 1,     2,     3,
  parent_id                           = 0,     1,     2,
  i_parent_start                      = 1,     40,    45,
@@ -144,7 +144,6 @@
  w_damping                           = 0,
  diff_opt                            = 1,
  km_opt                              = 4,
- use_theta_m												 = 0,
 /
 &bdy_control
  spec_bdy_width         = 10,

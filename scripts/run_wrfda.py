@@ -106,7 +106,8 @@ if __name__ == '__main__':
         'time_window_min': f"'{start_date.strftime('%Y-%m-%d_%H:%M:%S')}'",
         'time_window_max': f"'{end_date.strftime('%Y-%m-%d_%H:%M:%S')}'",
         'interval_seconds': interval * 3600,
-        'time_step': interval,
+        'time_step': 6,
+        'frames_per_outfile': 1000,
         'dx': grid_size,
         'dy': grid_size,
     }

@@ -61,19 +61,28 @@ if __name__ == '__main__':
     WRFDA_ROOT = os.environ.get('WRFDA_ROOT', None)
     NAMELISTS_DIR = os.environ.get('NAMELISTS_DIR', None)
 
+    FCST_RANGE1 = 24
+    FCST_RANGE2 = 12
+
+    interval_delta =  datetime.timedelta(hours=interval)
+    fcst_range1_delta = datetime.timedelta(hours=FCST_RANGE1)
+
+    valid_start_date = start_date - fcst_range1_delta
+    valid_end_date = end_date + fcst_range1_delta
+
     options = {
-        'start_year': start_date.year,
-        'start_month': str(start_date.month).zfill(2),
-        'start_day': str(start_date.day).zfill(2),
-        'start_hour': str(start_date.hour).zfill(2),
-        'end_year': end_date.year,
-        'end_month': str(end_date.month).zfill(2),
-        'end_day': str(end_date.day).zfill(2),
-        'end_hour': str(end_date.hour).zfill(2),
+        'start_year': valid_start_date.year,
+        'start_month': str(valid_start_date.month).zfill(2),
+        'start_day': str(valid_start_date.day).zfill(2),
+        'start_hour': str(valid_start_date.hour).zfill(2),
+        'end_year': valid_end_date.year,
+        'end_month': str(valid_end_date.month).zfill(2),
+        'end_day': str(valid_end_date.day).zfill(2),
+        'end_hour': str(valid_end_date.hour).zfill(2),
         'interval_seconds': interval * 3600,
         'history_interval': interval * 60,
         'frames_per_outfile': 1,
-        'time_step': interval,
+        'time_step': 6,
         'dx': grid_size,
         'dy': grid_size,
     }
@@ -96,42 +105,37 @@ if __name__ == '__main__':
     run_wrf.call_model('real', WRF_DIR, 8, srun)
     run_wrf.call_model('wrf', WRF_DIR, ntasks, srun, output=BE_DATA_DIR)
 
-    os.system(f"ls {BE_DATA_DIR}")
     print_msg(f"Formatting {BE_DATA_DIR}", 'header')
+    os.system(f"ls {BE_DATA_DIR}")
 
-    interval_delta = datetime.timedelta(hours=interval)
-    hour_delta = datetime.timedelta(hours=24)
     p_start_date = start_date
-    p_end_date = end_date - hour_delta
 
-    while p_start_date <= p_end_date:
+    while p_start_date <= end_date:
         folder_path = f"{BE_DATA_DIR}/{p_start_date.strftime('%Y%m%d%H')}"
         os.system(f"mkdir -p {folder_path}")
 
-        for i in range(1, int(24 / interval) + 1):
-            file_delta = datetime.timedelta(hours=interval*i)
+        for i in range(1, 3):
+            file_delta = datetime.timedelta(hours=FCST_RANGE2*i)
             filename_date = (p_start_date + file_delta).strftime('%Y-%m-%d_%H:%M:%S')
             os.system(f"cp {BE_DATA_DIR}/wrfout_d01_{filename_date} {folder_path}")
 
         p_start_date += interval_delta
 
-    valid_start_date = start_date + hour_delta
-    valid_end_date = p_end_date - hour_delta
+    gen_be_start_date = start_date + fcst_range1_delta
+    gen_be_end_date = end_date - fcst_range1_delta
 
-    # TODO: only works for the data example https://www2.mmm.ucar.edu/wrf/users/docs/user_guide_v4/v4.0/users_guide_chap6.html#_Domain-specific_background_error
-    # Error candidates: NUM_LEVELS, INTERVAL
-    # Debug: generate-wrfda-be "2021-01-05 00" "1021-01-06 18" -i 6 -n 64 -g 25000 --data-dir ./ --srun
-    # Next steps: debug with -g 1000
     env_vars = {
         'WRFVAR_DIR': f"{WRFDA_ROOT}/model/WRFDA",
-        'NL_CV_OPTIONS': 5,
-        'START_DATE': valid_start_date.strftime('%Y%m%d%H'),
-        'END_DATE': valid_end_date.strftime('%Y%m%d%H'),
-        'NUM_LEVELS': 32, # 40 (default)
+        'NL_CV_OPTIONS': 7, # u/v wind control variables
+        'START_DATE': gen_be_start_date.strftime('%Y%m%d%H'),
+        'END_DATE': gen_be_end_date.strftime('%Y%m%d%H'),
+        'NUM_LEVELS': 40, # = bottom_top = e_vert - 1
         'BIN_TYPE': 5,
-        'INTERVAL': interval, # 12 (default)
         'FC_DIR': BE_DATA_DIR,
-        'RUN_DIR': GEN_BE_DIR
+        'RUN_DIR': GEN_BE_DIR,
+        'FCST_RANGE1': FCST_RANGE1,
+        'FCST_RANGE2': FCST_RANGE2,
+        'INTERVAL': interval
     }
 
     print_msg('Running gen_be_wrapper.ksh', 'header')

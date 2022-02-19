@@ -10,7 +10,7 @@ module purge
 module load autotools prun/1.3 gnu8/8.3.0 openmpi3/3.1.4 ohpc wrf/4.3
 
 ## Dir structure
-export ROOT_DIR="/work/syseng/pub/WRFDA-4DVARV4.3"
+export ROOT_DIR="/work/syseng/pub/WRFDA-4.3-4DVAR"
 mkdir -p $ROOT_DIR/downloads
 mkdir -p $ROOT_DIR/model
 
@@ -46,6 +46,8 @@ cd $ROOT_DIR/model/WRFDA
 ./compile all_wrfvar >& compile.out
 
 echo "Successful compilation will produce 44 executables: (including da_wrfvar.exe)"
+FOUND=$(ls -l var/build/*exe var/obsproc/src/obsproc.exe | wc -l)
+echo "Found: $FOUND, list:"
 ls -l var/build/*exe var/obsproc/src/obsproc.exe
 
 if [ ! -f  var/build/da_wrfvar.exe ]; then
@@ -78,12 +80,12 @@ ln -s $ROOT_DIR/model/WRFDA/var/test/update_bc/parame.in $ROOT_DIR/work-dir
 echo "Writting modulefile..."
 
 mkdir -p /opt/ohpc/pub/modulefiles/wrfda/
-cat > /opt/ohpc/pub/modulefiles/wrfda/4.3 <<EOL
+cat > /opt/ohpc/pub/modulefiles/wrfda/4.3-4DVAR <<EOL
 #%Module1.0#####################################################################
 
 proc ModulesHelp { } {
     puts stderr " "
-    puts stderr "This module loads WRFDA/WRFPLUS"
+    puts stderr "This module loads WRFDA 4DVAR + WRFPLUS"
     puts stderr "\nVersion 4.3\n"
 }
 
@@ -115,4 +117,4 @@ echo "Setting permissions..."
 chgrp -R syseng $ROOT_DIR
 chmod -R 777 $ROOT_DIR
 
-echo "WRFDA-4.3 installed successfully!"
+echo "WRFDA-4.3 4DVAR installed successfully!"

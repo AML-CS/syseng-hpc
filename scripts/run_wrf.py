@@ -115,7 +115,7 @@ if __name__ == '__main__':
         'interval_seconds': interval * 3600,
         'history_interval': interval * 60,
         'frames_per_outfile': 1000,
-        'time_step': interval,
+        'time_step': 6,
         'dx': grid_size,
         'dy': grid_size,
     }
