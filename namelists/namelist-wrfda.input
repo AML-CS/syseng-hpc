@@ -23,7 +23,7 @@
 /
 
 &wrfvar7
- cv_options=5,
+ cv_options=7,
 /
 
 &wrfvar8
@@ -38,7 +38,7 @@
 /
 
 &wrfvar11
- seed_array1= 2021010600,
+ seed_array1= 2021010618,
  seed_array2=40
 /
 
@@ -61,7 +61,7 @@
 /
 
 &wrfvar18
- analysis_date= '2021-01-07_00:00:00',
+ analysis_date= '2021-01-06_18:00:00',
 /
 
 &wrfvar19
@@ -71,21 +71,21 @@
 /
 
 &wrfvar21
- time_window_min= '2021-01-07_00:00:00',
+ time_window_min= '2021-01-06_18:00:00',
 /
 
 &wrfvar22
- time_window_max= '2021-01-08_00:00:00',
+ time_window_max= '2021-01-07_00:00:00',
 /
 
 &time_control
  start_year= 2021,
  start_month= 01,
- start_day= 07,
- start_hour= 00,
+ start_day= 06,
+ start_hour= 18,
  end_year= 2021,
  end_month= 01,
- end_day= 08,
+ end_day= 07,
  end_hour= 00,
 /
 

@@ -68,6 +68,7 @@ if __name__ == '__main__':
 
     dspath = 'https://rda.ucar.edu/data/ds337.0/'
     filelist = [('tarfiles/{0:%Y}/prepbufr.{0:%Y}{0:%m}{0:%d}.nr.tar.gz'.format(date), date) for date in date_range]
+
     Path('prep-data').mkdir(parents=True, exist_ok=True)
 
     for (file, date) in filelist:

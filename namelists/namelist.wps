@@ -1,9 +1,9 @@
 &share
  wrf_core = 'ARW',
  max_dom = 1,
- start_date = '2021-01-05_00:00:00',
- end_date = '2021-01-15_00:00:00',
- interval_seconds = 21600,
+ start_date = '2022-03-27_18:00:00',
+ end_date = '2022-03-28_03:00:00',
+ interval_seconds = 10800,
  io_form_geogrid = 2,
 /
 
@@ -12,20 +12,20 @@
  parent_grid_ratio = 1,
  i_parent_start    = 1,
  j_parent_start    = 1,
- e_we          = 100,
- e_sn          = 100,
+ e_we          = 91,
+ e_sn          = 82,
  geog_data_res = 'default',
- dx = 1000,
- dy = 1000,
- map_proj =  'lambert',
- ref_lat   = 10.968,
- ref_lon   = -74.781,
- truelat1  = 10.968,
- truelat2  = 10.968,
- stand_lon = -74.781,
+ dx = 0.003205,
+ dy = 0.003205,
+ map_proj =  'lat-lon',
+ ref_lat   = 10.981,
+ ref_lon   = -74.822,
+ truelat1  = 10.981,
+ truelat2  = 10.981,
+ stand_lon = -74.822,
  geog_data_path = '/work/syseng/pub/WRFV4.3/data/WPS_GEOG/'
- ref_x = 50.0,
- ref_y = 37.5,
+ ref_x = 45.5,
+ ref_y = 41.0,
 /
 
 &ungrib
@@ -37,3 +37,17 @@
  fg_name = 'FILE'
  io_form_metgrid = 2,
 /
+
+&mod_levs
+ press_pa = 201300 , 200100 , 100000 ,
+             95000 ,  90000 ,
+             85000 ,  80000 ,
+             75000 ,  70000 ,
+             65000 ,  60000 ,
+             55000 ,  50000 ,
+             45000 ,  40000 ,
+             35000 ,  30000 ,
+             25000 ,  20000 ,
+             15000 ,  10000 ,
+              5000 ,   1000
+ /

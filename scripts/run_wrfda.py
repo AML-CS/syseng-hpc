@@ -9,7 +9,14 @@ import argparse
 import datetime
 
 import run_wrf
+from run_wrf import WRF_DIR, update_wrf_namelist
+
 from utils import print_msg, update_namelist
+
+WRFDA_DIR = os.environ.get('WRFDA_DIR', None)
+
+NAMELISTS_DIR = os.environ.get('NAMELISTS_DIR', None)
+NAMELIST_FILE = f"{NAMELISTS_DIR}/namelist-wrfda.input"
 
 def init_cli():
     parser = argparse.ArgumentParser(description='Run WRFDA da_wrfvar.exe + generate ensemble')
@@ -72,6 +79,13 @@ def call_model(wrf_dir, wrfda_dir, ntasks, srun):
 
     return True
 
+def update_wrfda_namelist(options, debug_mode):
+    os.system(f"ln -sf {NAMELIST_FILE} {WRFDA_DIR}/namelist.input")
+    update_namelist(NAMELIST_FILE, options)
+
+    if debug_mode:
+        for (key, value) in options.items():
+            print_msg(f"{key}: {value}", 'header')
 
 if __name__ == '__main__':
     args = init_cli()
@@ -80,18 +94,13 @@ if __name__ == '__main__':
     end_date = datetime.datetime.strptime(args.end_date, '%Y-%m-%d %H')
     interval = args.interval
     grid_size = args.grid_size
-    output = args.output
+    output = os.path.abspath(args.output)
     generate_ensemble = args.generate_ensemble
     ntasks = args.ntasks
     srun = args.srun
 
-    WRFDA_DIR = os.environ.get('WRFDA_DIR', None)
     if WRFDA_DIR is None:
         raise Exception('Module wrfda not loaded')
-
-    WRF_DIR = os.environ.get('WRF_DIR', None)
-    NAMELISTS_DIR = os.environ.get('NAMELISTS_DIR', None)
-    NAMELIST_FILE = f"{NAMELISTS_DIR}/namelist-wrfda.input"
 
     options = {
         'start_year': start_date.year,
@@ -111,21 +120,32 @@ if __name__ == '__main__':
         'dx': grid_size,
         'dy': grid_size,
     }
+    update_wrfda_namelist(options, debug_mode)
 
-    if debug_mode:
-        for (key, value) in options.items():
-            print_msg(f"{key}: {value}", 'header')
+    update_wrf_namelist({
+        'start_year': options['start_year'],
+        'start_month': options['start_month'],
+        'start_day': options['start_day'],
+        'start_hour': options['start_hour'],
+        'end_year': options['end_year'],
+        'end_month': options['end_month'],
+        'end_day': options['end_day'],
+        'end_hour': options['end_hour'],
+        'interval_seconds': options['interval_seconds'],
+        'history_interval': interval * 60,
+        'frames_per_outfile': options['frames_per_outfile'],
+        'time_step': options['time_step'],
+        'dx': options['dx'],
+        'dy': options['dy'],
+    }, debug_mode)
 
-    os.system(f"ln -sf {NAMELIST_FILE} {WRFDA_DIR}/namelist.input")
-    update_namelist(NAMELIST_FILE, options)
+    start = time.time()
 
-    output = os.path.abspath(args.output)
+    run_wrf.call_model('real', WRF_DIR, 8, srun)
+    run_wrf.call_model('wrf', WRF_DIR, ntasks, srun, output=f"{output}/fg")
 
     if generate_ensemble > 0:
-        start = time.time()
 
-        run_wrf.call_model('real', WRF_DIR, 8, srun)
-        run_wrf.call_model('wrf', WRF_DIR, ntasks, srun, output=f"{output}/original")
         for i in range(1, generate_ensemble + 1):
             print_msg(f"Member {i}", 'header')
 
@@ -136,19 +156,22 @@ if __name__ == '__main__':
                 'seed_array1': start_date.strftime('%Y%m%d%H'),
                 'seed_array2': i
             }
-            update_namelist(NAMELIST_FILE, ensemble_options)
+            update_wrfda_namelist(ensemble_options, debug_mode)
 
             print('Perturbing initial condition...')
             if call_model(WRF_DIR, WRFDA_DIR, ntasks, srun):
                 print('Updating boundary conditions...')
                 os.system('./da_update_bc.exe >& update.out')
                 os.system(f"cp wrfbdy_d01 {WRF_DIR}/run")
+
                 print('Running simulation with new initial conditions...')
                 os.system(f"cp wrfvar_output {WRF_DIR}/run/wrfinput_d01")
-                run_wrf.call_model('wrf', WRF_DIR, ntasks, srun, output=f"{output}/m{i}")
+                run_wrf.call_model('wrf', WRF_DIR, ntasks, srun, output=f"{output}/e{str(i).zfill(3)}")
                 print_msg(f"Ensemble member {i} created", 'okgreen')
 
         print_msg(f"Ensemble generated succesfully", 'okgreen')
-        print_msg("{:.3f} seconds".format(time.time() - start), 'okgreen')
     else:
         call_model(WRF_DIR, WRFDA_DIR, ntasks, srun)
+        os.system(f"cp wrfvar_output {output}/wrfvar_output")
+
+    print_msg("{:.3f} seconds".format(time.time() - start), 'okgreen')

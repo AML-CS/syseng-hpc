@@ -66,6 +66,7 @@ if __name__ == '__main__':
 
     interval_delta =  datetime.timedelta(hours=interval)
     fcst_range1_delta = datetime.timedelta(hours=FCST_RANGE1)
+    fcst_range2_delta = datetime.timedelta(hours=FCST_RANGE2)
 
     valid_start_date = start_date - fcst_range1_delta
     valid_end_date = end_date + fcst_range1_delta
@@ -122,7 +123,7 @@ if __name__ == '__main__':
         p_start_date += interval_delta
 
     gen_be_start_date = start_date + fcst_range1_delta
-    gen_be_end_date = end_date - fcst_range1_delta
+    gen_be_end_date = end_date - fcst_range2_delta
 
     env_vars = {
         'WRFVAR_DIR': f"{WRFDA_ROOT}/model/WRFDA",

@@ -62,14 +62,13 @@ def pad_zero(time: str):
     else:
         return time
 
+Path('grib-data').mkdir(parents=True, exist_ok=True)
+os.chdir('./grib-data')
 
 filelist = []
-
 for date in daterange(start_date, end_date):
     for i in range(0, 19, 6):
         filelist.append('grib2/{0:%Y}/{0:%Y}.{0:%m}/fnl_{0:%Y}{0:%m}{0:%d}_{1}_00.grib2'.format(date, pad_zero(str(i))))
-
-#'grib2/2020/2020.11/fnl_20201130_18_00.grib2'
 
 for file in filelist:
     filename=dspath+file
@@ -85,6 +84,4 @@ for file in filelist:
                 check_file_status(file_base, filesize)
     check_file_status(file_base, filesize)
 
-Path('real-data').mkdir(parents=True, exist_ok=True)
-os.system("mv *.grib2 ./real-data")
-print("\nObservations saved in ./real-data")
+print("\nData saved in ./grib-data")

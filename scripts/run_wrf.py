@@ -10,6 +10,11 @@ import datetime
 
 from utils import print_msg, update_namelist
 
+WRF_DIR = os.environ.get('WRF_DIR', None)
+
+NAMELISTS_DIR = os.environ.get('NAMELISTS_DIR', None)
+NAMELIST_FILE = f"{NAMELISTS_DIR}/namelist-wrf.input"
+
 def init_cli():
     parser = argparse.ArgumentParser(description='Run WRF real.exe or wrf.exe')
 
@@ -23,7 +28,7 @@ def init_cli():
                         help='Hours interval, default: 6')
 
     parser.add_argument('-g', '--grid-size', metavar='grid_size', type=int,
-                        default=25000, help='Grid size (meters), default: 25000')
+                        default=None, help='Grid size (meters), default: None')
 
     parser.add_argument('-o', '--output', metavar='output', type=str,
                         default='.', help='Output directory')
@@ -78,10 +83,19 @@ def call_model(type, wrf_dir, ntasks, srun, output=None):
 
     if type == 'wrf':
         os.system('chmod 777 wrfout*')
-        os.system(f"cp wrfout* {os.path.abspath(output)}")
+        if output:
+            os.system(f"cp wrfout* {os.path.abspath(output)}")
 
     print_msg('Success complete', 'okgreen')
     print_msg("{:.3f} seconds".format(time.time() - start), 'okgreen')
+
+def update_wrf_namelist(options, debug_mode):
+    os.system(f"ln -sf {NAMELIST_FILE} {WRF_DIR}/run/namelist.input")
+    update_namelist(NAMELIST_FILE, options)
+
+    if debug_mode:
+        for (key, value) in options.items():
+            print_msg(f"{key}: {value}", 'header')
 
 if __name__ == '__main__':
     args = init_cli()
@@ -96,14 +110,10 @@ if __name__ == '__main__':
     ntasks = args.ntasks
     srun = args.srun
 
-    WRF_DIR = os.environ.get('WRF_DIR', None)
     if WRF_DIR is None:
         raise Exception('Module wrf not loaded')
 
-    NAMELISTS_DIR = os.environ.get('NAMELISTS_DIR', None)
-    NAMELIST_FILE = f"{NAMELISTS_DIR}/namelist-wrf.input"
-
-    options = {
+    namelist_input = {
         'start_year': start_date.year,
         'start_month': str(start_date.month).zfill(2),
         'start_day': str(start_date.day).zfill(2),
@@ -115,17 +125,13 @@ if __name__ == '__main__':
         'interval_seconds': interval * 3600,
         'history_interval': interval * 60,
         'frames_per_outfile': 1000,
-        'time_step': 6,
-        'dx': grid_size,
-        'dy': grid_size,
     }
 
-    if debug_mode:
-        for (key, value) in options.items():
-            print_msg(f"{key}: {value}", 'header')
+    if grid_size:
+        namelist_input['dx'] = grid_size
+        namelist_input['dy'] = grid_size
 
-    os.system(f"ln -sf {NAMELIST_FILE} {WRF_DIR}/run/namelist.input")
-    update_namelist(NAMELIST_FILE, options)
+    update_wrf_namelist(namelist_input, debug_mode)
 
     if run_real:
         call_model('real', WRF_DIR, ntasks, srun)
