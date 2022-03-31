@@ -1,0 +1,80 @@
+&record1
+ obs_gts_filename = /work/syseng/pub/WRFDA-4.3-3DVAR/model/WRFDA/var/obsproc/obs.2022022012,
+ obs_err_filename = 'obserr.txt',
+ fg_format = 'WRF',
+ gts_from_mmm_archive = .false.,
+/
+
+&record2
+ time_window_min  = 2022-02-20_11:00:00,
+ time_analysis    = 2022-02-20_12:00:00,
+ time_window_max  = 2022-02-20_13:00:00,
+/
+
+&record3
+ max_number_of_obs        = 400000,
+ fatal_if_exceed_max_obs  = .TRUE.,
+/
+
+&record4
+ qc_test_vert_consistency = .TRUE.,
+ qc_test_convective_adj   = .TRUE.,
+ qc_test_above_lid        = .TRUE.,
+ remove_above_lid         = .false.,
+ domain_check_h           = .true.,
+ Thining_SATOB            = .false.,
+ Thining_SSMI             = .false.,
+ Thining_QSCAT            = .false.,
+ calc_psfc_from_qnh       = .false.,
+/
+
+&record5
+ print_gts_read           = .TRUE.,
+ print_gpspw_read         = .TRUE.,
+ print_recoverp           = .TRUE.,
+ print_duplicate_loc      = .TRUE.,
+ print_duplicate_time     = .TRUE.,
+ print_recoverh           = .TRUE.,
+ print_qc_vert            = .TRUE.,
+ print_qc_conv            = .TRUE.,
+ print_qc_lid             = .TRUE.,
+ print_uncomplete         = .TRUE.,
+/
+
+&record6
+ ptop =  1000.0,
+ base_pres       = 100000.0,
+ base_temp       = 290.0,
+ base_lapse      = 50.0,
+ base_strat_temp = 215.0,
+ base_tropo_pres = 20000.0
+/
+
+&record7
+ IPROJ = 1,
+ PHIC  = 11.08035,
+ XLONC = -74.78101,
+ TRUELAT1= 10.968,
+ TRUELAT2= 10.968,
+ MOAD_CEN_LAT = 11.08035,
+ STANDARD_LON = -74.781,
+/
+
+&record8
+ IDD    =   1,
+ MAXNES =   1,
+ NESTIX =  60,  200,  136,  181,  211,
+ NESTJX =  90,  200,  181,  196,  211,
+ DIS    =  60,  10.,  3.3,  1.1,  1.1,
+ NUMC   =    1,    1,   2,     3,    4,
+ NESTI  =    1,   40,  28,    35,   45,
+ NESTJ  =    1,   60,  25,    65,   55,
+/
+
+&record9
+ OUTPUT_OB_FORMAT = 1,
+ use_for          = '3DVAR',
+ num_slots_past   = 3,
+ num_slots_ahead  = 3,
+ write_metar = .true.,
+/

@@ -80,7 +80,7 @@ def call_model(wrf_dir, wrfda_dir, ntasks, srun):
     return True
 
 def update_wrfda_namelist(options, debug_mode):
-    os.system(f"ln -sf {NAMELIST_FILE} {WRFDA_DIR}/namelist.input")
+    os.system(f"ln -sf {NAMELIST_FILE} {WRFDA_DIR}/namelist-wrfda.input")
     update_namelist(NAMELIST_FILE, options)
 
     if debug_mode:

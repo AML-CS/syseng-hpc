@@ -15,6 +15,7 @@ WRF_DIR = os.environ.get('WRF_DIR', None)
 NAMELISTS_DIR = os.environ.get('NAMELISTS_DIR', None)
 NAMELIST_FILE = f"{NAMELISTS_DIR}/namelist-wrf.input"
 
+
 def init_cli():
     parser = argparse.ArgumentParser(description='Run WRF real.exe or wrf.exe')
 
@@ -50,6 +51,7 @@ def init_cli():
 
     return parser.parse_args()
 
+
 def call_model(type, wrf_dir, ntasks, srun, output=None):
     os.chdir(f"{wrf_dir}/run")
 
@@ -67,7 +69,8 @@ def call_model(type, wrf_dir, ntasks, srun, output=None):
         print_msg('Running wrf.exe...', 'header')
 
     if srun:
-        subprocess.run(['srun', '-n', str(ntasks), '--mpi=pmi2', f"{type}.exe"])
+        subprocess.run(['srun', '-n', str(ntasks),
+                       '--mpi=pmi2', f"{type}.exe"])
     else:
         subprocess.run(['mpirun', '-n', str(ntasks), f"{type}.exe"])
 
@@ -89,6 +92,7 @@ def call_model(type, wrf_dir, ntasks, srun, output=None):
     print_msg('Success complete', 'okgreen')
     print_msg("{:.3f} seconds".format(time.time() - start), 'okgreen')
 
+
 def update_wrf_namelist(options, debug_mode):
     os.system(f"ln -sf {NAMELIST_FILE} {WRF_DIR}/run/namelist.input")
     update_namelist(NAMELIST_FILE, options)
@@ -96,6 +100,7 @@ def update_wrf_namelist(options, debug_mode):
     if debug_mode:
         for (key, value) in options.items():
             print_msg(f"{key}: {value}", 'header')
+
 
 if __name__ == '__main__':
     args = init_cli()

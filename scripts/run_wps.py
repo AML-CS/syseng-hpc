@@ -3,7 +3,7 @@
 import os
 import sys
 import time
-import subprocess
+import glob
 import argparse
 import datetime
 
@@ -15,8 +15,10 @@ WRF_DIR = os.environ.get('WRF_DIR', None)
 NAMELISTS_DIR = os.environ.get('NAMELISTS_DIR', None)
 NAMELIST_FILE = f"{NAMELISTS_DIR}/namelist.wps"
 
+
 def init_cli():
-    parser = argparse.ArgumentParser(description='Run geogrid + ungrid + metgrid')
+    parser = argparse.ArgumentParser(
+        description='Run geogrid + ungrid + metgrid')
 
     parser.add_argument('start_date', metavar='start_date', type=str,
                         help='First perturbation valid date (YYYY-mm-dd H)')
@@ -38,6 +40,7 @@ def init_cli():
 
     return parser.parse_args()
 
+
 def update_wps_namelist(options, debug_mode):
     os.system(f"ln -sf {NAMELIST_FILE} {WPS_DIR}/namelist.wps")
     update_namelist(NAMELIST_FILE, options)
@@ -45,6 +48,7 @@ def update_wps_namelist(options, debug_mode):
     if debug_mode:
         for (key, value) in options.items():
             print_msg(f"{key}: {value}", 'header')
+
 
 if __name__ == '__main__':
     args = init_cli()
@@ -81,7 +85,7 @@ if __name__ == '__main__':
     os.system(f"rm -f {WRF_DIR}/run/met_em*")
 
     print('Running geogrid...')
-    if os.system('./geogrid.exe >& geogrid.log') != 0 and len(glob.glob('GRIBFILE*')) > 0:
+    if os.system('./geogrid.exe >& geogrid.log') != 0 or len(glob.glob('geo_em*')) == 0:
         print_msg(f"An error ocurred, check {WPS_DIR}/geogrid.log", 'fail')
         sys.exit(1)
 
@@ -93,14 +97,14 @@ if __name__ == '__main__':
 
     os.system(f"./link_grib.csh {data_dir}/*")
     os.system('ln -sf ungrib/Variable_Tables/Vtable.GFS Vtable')
-    if os.system('./ungrib.exe >& ungrib.log') != 0 and len(glob.glob('geo_em*')) > 0:
+    if os.system('./ungrib.exe >& ungrib.log') != 0 or len(glob.glob('GRIBFILE*')) == 0:
         print_msg(f"An error ocurred, check {WPS_DIR}/ungrib.log", 'fail')
         sys.exit(1)
 
     print_msg('Success complete', 'okgreen')
 
     print('Running metgrid...')
-    if os.system('./metgrid.exe >& metgrid.log') != 0 and len(glob.glob('met_em*')) > 0:
+    if os.system('./metgrid.exe >& metgrid.log') != 0 or len(glob.glob('met_em*')) == 0:
         print_msg(f"An error ocurred, check {WPS_DIR}/metgrid.log", 'fail')
         sys.exit(1)
 

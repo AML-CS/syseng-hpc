@@ -171,7 +171,7 @@ chmod +x $ROOT_DIR/model/WRFDomainWizard/run_DomainWizard
 echo "Adding scripts to PATH..."
 export PATH=/work/syseng/pub/syseng-hpc/scripts:$PATH
 
-echo "Writting modulefile..."
+# echo "Writting modulefile..."
 
 mkdir -p /opt/ohpc/pub/modulefiles/wrf/
 cat > /opt/ohpc/pub/modulefiles/wrf/4.3  <<EOL
@@ -219,7 +219,6 @@ setenv          WRF_DIR                 $ROOT_DIR/model/WRF-4.3
 setenv          WPS_DIR                 $ROOT_DIR/model/WPS-4.3
 setenv          GEOG_DATA_PATH          $ROOT_DIR/data/WPS_GEOG
 setenv          REAL_DATA_PATH          $ROOT_DIR/data/WPS_REAL
-setenv          ARW_POST                $ROOT_DIR/model/ARWpost
 
 set-alias       download-grib	        "/work/syseng/pub/syseng-hpc/scripts/download-grib.py"
 set-alias       run-wps	                "/work/syseng/pub/syseng-hpc/scripts/run_wps.py"

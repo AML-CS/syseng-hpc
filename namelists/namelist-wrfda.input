@@ -11,6 +11,8 @@
 /
 
 &wrfvar4
+ use_gpsrefobs=false,
+ use_metarobs=true,
 /
 
 &wrfvar5
